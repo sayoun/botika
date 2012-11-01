@@ -316,14 +316,6 @@ def process_order_transport(data):
         for item in element['cargo']:
             print "%-10s\t->\t%-10s %6s %-10s" % (element['source'], element['destination'], item['number'], item['resource'])
 
-# fp = open('todo.json')
-# tasks = json.load(fp)
-# fp.close()
-
-# for process in tasks:
-#     print "in process: " + process
-#     process_order(process, tasks[process])
-
 
 fp = open('report.json')
 data = json.load(fp)
@@ -352,4 +344,4 @@ if p:
         f = open('body_to_mail', 'w')
         f.write(p.get_content().encode('utf-8'))
         f.close()
-        # print subprocess.call('mail -s "botika report" dejan.filipovic@gmail.com < body_to_mail', shell=True)
+        # print subprocess.call('mail -s "botika report" [user@server] < body_to_mail', shell=True)
