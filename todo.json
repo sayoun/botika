@@ -1,0 +1,23 @@
+{
+    "build": [
+        {
+            "source": "Polis",
+            "cargo": [
+                {
+                    "building":"architect",
+                    "level":"20"
+                }
+            ]
+        }
+    ],
+    "transport": [
+        {
+            "source": "Tyrion",
+            "destination" : "Polis",
+            "cargo": [
+                {"resource" : "wine",
+                 "number" : "1000"}
+            ]
+        }
+    ]
+}

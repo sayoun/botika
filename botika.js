@@ -1,0 +1,73 @@
+var casper = require('casper').create({
+    viewportSize: {
+        width: 1024,
+        height: 768
+    },
+    logLevel: 'debug',
+    verbose: true,
+    clientScripts: ["includes/jquery-1.8.2.min.js"]
+});
+
+var dump = require("utils").dump;
+var utils = require("utils");
+var fs = require('fs');
+var account_file = 'account.json';
+var account_info = {};
+
+phantom.injectJs('includes/cli.js');
+phantom.injectJs('includes/report.js');
+phantom.injectJs('includes/todo.js');
+phantom.injectJs('includes/core.js');
+
+casper.cli_check();
+
+var filename_to_dump = 'report.json';
+var todo_file = 'todo.json';
+var mega_data = {};
+var force_town_key = false;
+
+casper.start('http://fr.ikariam.com', function() {
+
+    this.fill('form#loginForm', {
+        'uni_url':          account_info.server,
+        'name':             account_info.login,
+        'password':         account_info.password,
+        'mobileCheckBox':   true
+    }, true);
+
+});
+
+var names = [];
+var next;
+var x = require('casper').selectXPath;
+
+
+//  POST LOGIN
+casper.then(function() {
+    // this.capture('ikariam_login.png');
+
+    // AUTO ACCEPT DAILY BONUS
+    if (this.exists('div[class="dailyActivityButton"] input[class~="okButton"]')) {
+        this.thenClick('div[class="dailyActivityButton"] input[class~="okButton"]');
+    }
+
+    if (action_key == 'report')
+    {
+        casper.action_report();
+    }
+
+    if (action_key == 'todo')
+    {
+        casper.action_todo();
+    }
+
+});
+
+casper.run(function() {
+    this.echo('running done.');
+
+    dump(mega_data);
+    fs.write(filename_to_dump, utils.serialize(mega_data, 4), 'w');
+
+    this.exit(0);
+});
