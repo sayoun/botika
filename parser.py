@@ -343,10 +343,3 @@ if p:
         f.write(p.get_content().encode('utf-8'))
         f.close()
         # print subprocess.call('mail -s "botika report" [user@server] < body_to_mail', shell=True)
-
-
-dt = 10510
-if dt > 3600:
-    h = dt / 3600
-    m = (dt - (h * 3600)) / 60
-    '%dh %dm' % (h, m)
