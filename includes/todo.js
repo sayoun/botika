@@ -119,6 +119,14 @@ casper.todo_build = function(item, names) {
     // this.echo(item.cargo);
     // dump(item);
 
+    this.then(function() {
+        if (mega_data['data']['construction'][item.source].length > 0)
+        {
+            this.echo('SKIPPING BUILDING ALREADY RUNNING FOR :'+item.source);
+            return false;
+        }
+    });
+
     var timeur = Math.floor((Math.random()*3000)+1);
     this.echo('timeur = '+ timeur);
     this.wait(timeur);
@@ -173,7 +181,7 @@ casper.todo_tranport = function(item, names) {
         {
             this.thenClick('#mainview > #locations > li[class="port"] > a');
             this.then(function() {
-                // this.capture('port1.png');
+                this.capture('port1.png');
 
                 // AUTO ACCEPT SHIP BUYOUT
                 if (this.exists('div[class="forminput"] > a'))
@@ -183,7 +191,7 @@ casper.todo_tranport = function(item, names) {
 
                 this.thenClick('#mainview > div[class="contentBox01h"] li[title="'+item.destination+'"] > a');
                 this.then(function() {
-                    // this.capture('port2.png');
+                    this.capture('port2.png');
 
                     var entry = {};
                     this.each(item['cargo'], function(self, cargo) {
@@ -227,11 +235,19 @@ casper.todo_tranport = function(item, names) {
                     this.fill('#mainview > form', entry, false);
 
                     this.then(function() {
-                        // this.capture('port3.png');
+                        this.capture('port3.png');
                         this.echo(this.fetchText('#arrival'));
 
                         // on submit !
                         this.thenClick('#submit');
+                    });
+
+                    this.then(function() {
+                        // post submit
+                        this.capture('port4.png');
+
+                        // TODO : check qu'on a bien tout envoyé
+                        // si oui on update le todojson en mémoire
                     });
                 });
             });

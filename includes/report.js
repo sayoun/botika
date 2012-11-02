@@ -277,22 +277,25 @@ function parsePage() {
     return liste_batiments;
 }
 
-var processPage = function(name) {
+var processPage = function(name, wine) {
 
     this.echo('Process page for: '+name);
     // this.capture('test-'+name+'.png');
 
-    // GET WINE CONSUME INFO
-    if (this.exists('#mainview > #locations > li[class="tavern"] > a'))
+    if (wine)
     {
-        this.thenClick('#mainview > #locations > li[class="tavern"] > a');
-        this.then(function() {
-            var city_data_wine = this.evaluate(getWineUsedInfo);
-            mega_data['data']['wine'][name] = city_data_wine;
+        // GET WINE CONSUME INFO
+        if (this.exists('#mainview > #locations > li[class="tavern"] > a'))
+        {
+            this.thenClick('#mainview > #locations > li[class="tavern"] > a');
+            this.then(function() {
+                var city_data_wine = this.evaluate(getWineUsedInfo);
+                mega_data['data']['wine'][name] = city_data_wine;
 
-            // on revient sur l'ecran de la ville
-            this.thenClick('#changeCityForm li[class="viewCity"] > a');
-        });
+                // on revient sur l'ecran de la ville
+                this.thenClick('#changeCityForm li[class="viewCity"] > a');
+            });
+        }
     }
     // GET BATIMENT INFO
     var city_building = this.evaluate(parsePage);

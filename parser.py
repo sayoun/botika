@@ -5,6 +5,7 @@ import codecs
 import sys
 import subprocess
 import json
+from time import time
 
 streamWriter = codecs.lookup('utf-8')[-1]
 sys.stdout = streamWriter(sys.stdout)
@@ -14,6 +15,19 @@ def convert_hours_to_human(dt):
 
     if dt:
         return "%dd %dh" % ((dt / 24), (dt % 24))
+    return ""
+
+
+def convert_seconds_to_human(dt):
+
+    if dt:
+        h = 0
+        if dt > 3600:
+            h = dt / 3600
+
+        m = (dt - (h * 3600)) / 60
+        return '%dh%dm' % (h, m)
+
     return ""
 
 
@@ -34,7 +48,7 @@ class Parser():
         dict_print('News')
         dict_print('-' * 100)
 
-        for item in data['news']:
+        for item in data:
             extra = '   '
             if 'new' in item:
                 self.to_mail = True
@@ -52,7 +66,7 @@ class Parser():
         dict_print('Diplomacy')
         dict_print('-' * 100)
 
-        for item in data['diplomacy']:
+        for item in data:
             extra = '   '
             if 'new' in item:
                 self.to_mail = True
@@ -88,26 +102,26 @@ class Parser():
 
         total_wood, total_marble, total_wine, total_glass, total_sulfur = 0, 0, 0, 0, 0
 
-        for city in data['data']['resources']:
+        for city in data:
 
             extra = ''
             output_resource_line = []
 
             for res in ENUM_RESOURCES:
 
-                if data['data']['resources'][city][res]['full'] > 95:
+                if data[city][res]['full'] > 95:
                     extra = '<- ** WARNING **'
                     self.to_mail = True
 
-                self.get_resource_output(res, data['data']['resources'][city], output_resource_line)
+                self.get_resource_output(res, data[city], output_resource_line)
 
             dict_print("%-10s %s %s" % (city, ''.join(output_resource_line), extra))
 
-            total_wood += data['data']['resources'][city]['wood']['value']
-            total_marble += data['data']['resources'][city]['marble']['value']
-            total_wine += data['data']['resources'][city]['wine']['value']
-            total_glass += data['data']['resources'][city]['glass']['value']
-            total_sulfur += data['data']['resources'][city]['sulfur']['value']
+            total_wood += data[city]['wood']['value']
+            total_marble += data[city]['marble']['value']
+            total_wine += data[city]['wine']['value']
+            total_glass += data[city]['glass']['value']
+            total_sulfur += data[city]['sulfur']['value']
 
         dict_print('-' * 150)
         dict_print("%-10s \t%16s \t%16s \t%16s \t%16s \t%16s" % ('Total',
@@ -131,17 +145,17 @@ class Parser():
         dict_print(header)
         dict_print('-' * 100)
 
-        for item in data['data']['wine']:
+        for item in data:
                 extra = ''
-                if 'empty' in data['data']['wine'][item]:
-                    if data['data']['wine'][item].get('empty', 0) < 5:
+                if 'empty' in data[item]:
+                    if data[item].get('empty', 0) < 5:
                         extra = '<- ** WARNING **'
                         self.to_mail = True
 
                 dict_print("%-10s \t%12s \t%12s \t%12s %s" % (item,
-                                                    data['data']['wine'][item].get('wine_current', 0),
-                                                    data['data']['wine'][item].get('wine_used', '--'),
-                                                    data['data']['wine'][item].get('empty', '--'),
+                                                    data[item].get('wine_current', 0),
+                                                    data[item].get('wine_used', '--'),
+                                                    data[item].get('empty', '--'),
                                                     extra
                                                     ))
         dict_print('-' * 100)
@@ -260,22 +274,21 @@ class Parser():
 
         dict_print = self.dict_print
 
-        header = "%-10s \t%-12s \t%12s \t%20s \t%12s" % ('City', 'batiment', 'niveau', 'date fin', 'duree totale')
+        header = "%-10s \t%-12s \t%12s \t%20s \t%12s" % ('City', 'batiment', 'niveau', 'date fin', 'temps restant')
         dict_print('-' * 100)
         dict_print(header)
         dict_print('-' * 100)
 
         from datetime import datetime
 
-        for item in data['data']['construction']:
-            if data['data']['construction'][item]:
+        for item in data:
+            if data[item]:
                 # print item, data['data']['construction'][item]
                 dict_print("%-10s \t%-12s \t%12s \t%20s \t%12s" % (item,
-                                    data['data']['construction'][item][0]['type'],
-                                    data['data']['construction'][item][0]['level'],
-                                    datetime.fromtimestamp(int(data['data']['construction'][item][0]['end_date'])),
-                                    # datetime.fromtimestamp(int(data['data']['construction'][item][0]['current_date'])),
-                                    datetime.utcfromtimestamp(int(data['data']['construction'][item][0]['end_date']) - int(data['data']['construction'][item][0]['current_date'])).strftime('%Hh%Mm')
+                                    data[item][0]['type'],
+                                    data[item][0]['level'],
+                                    datetime.fromtimestamp(int(data[item][0]['end_date'])),
+                                    convert_seconds_to_human(int(data[item][0]['end_date']) - int(round(time())))
                                     ))
 
         dict_print('-' * 100)
@@ -296,12 +309,24 @@ data = json.load(fp)
 fp.close()
 
 p = Parser()
-p.get_constructions(data)
-p.get_news(data)
-p.get_diplo_msg(data)
-p.get_buildings(data['data']['buildings'])
-p.get_wine_status(data)
-p.get_resources(data)
+
+if 'construction' in data['data']:
+    p.get_constructions(data['data']['construction'])
+
+if 'news' in data:
+    p.get_news(data['news'])
+
+if 'diplomacy' in data:
+    p.get_diplo_msg(data['diplomacy'])
+
+if 'buildings' in data['data']:
+    p.get_buildings(data['data']['buildings'])
+
+if 'wine' in data['data']:
+    p.get_wine_status(data['data']['wine'])
+
+if 'resources' in data['data']:
+    p.get_resources(data['data']['resources'])
 
 print p.get_content()
 
@@ -318,3 +343,10 @@ if p:
         f.write(p.get_content().encode('utf-8'))
         f.close()
         # print subprocess.call('mail -s "botika report" [user@server] < body_to_mail', shell=True)
+
+
+dt = 10510
+if dt > 3600:
+    h = dt / 3600
+    m = (dt - (h * 3600)) / 60
+    '%dh %dm' % (h, m)

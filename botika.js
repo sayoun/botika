@@ -11,8 +11,10 @@ var casper = require('casper').create({
 var dump = require("utils").dump;
 var utils = require("utils");
 var fs = require('fs');
+var x = require('casper').selectXPath;
 var account_file = 'account.json';
 var account_info = {};
+var force_town_key = false;
 
 phantom.injectJs('includes/cli.js');
 phantom.injectJs('includes/report.js');
@@ -24,7 +26,7 @@ casper.cli_check();
 var filename_to_dump = 'report.json';
 var todo_file = 'todo.json';
 var mega_data = {};
-var force_town_key = false;
+
 
 casper.start('http://fr.ikariam.com', function() {
 
@@ -39,8 +41,6 @@ casper.start('http://fr.ikariam.com', function() {
 
 var names = [];
 var next;
-var x = require('casper').selectXPath;
-
 
 //  POST LOGIN
 casper.then(function() {
@@ -49,6 +49,19 @@ casper.then(function() {
     // AUTO ACCEPT DAILY BONUS
     if (this.exists('div[class="dailyActivityButton"] input[class~="okButton"]')) {
         this.thenClick('div[class="dailyActivityButton"] input[class~="okButton"]');
+    }
+
+    if (force_town_key)
+    {
+        this.echo('FORCING TOWN REQUESTED:'+force_town_key);
+        // ON FORCE LA VILLE A CHECKER
+        names.push(force_town_key);
+    }
+    else
+    {
+        // GET NB TOWN (NAMES)
+        names = this.evaluate(getNames);
+        // dump(names);
     }
 
     if (action_key == 'report')
@@ -66,6 +79,7 @@ casper.then(function() {
 casper.run(function() {
     this.echo('running done.');
 
+    // TODO : sauver aussi le todo.json qui aura mis a jour avec ce qu'il a fait
     dump(mega_data);
     fs.write(filename_to_dump, utils.serialize(mega_data, 4), 'w');
 

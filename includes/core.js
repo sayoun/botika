@@ -34,65 +34,7 @@ casper.action_report = function action_report() {
             });
         }
     });
-    //  POST ADVISORS
-    this.then(function() {
-
-        // GET GLOBAL RESOURCE INFO
-        var data = this.evaluate(getGlobalInfo);
-        // dump(data);
-        mega_data['global'] = data;
-        mega_data['data'] = {
-            'resources': {},
-            'buildings': {},
-            'construction': {},
-            'wine': {}
-        };
-
-        // GET NB TOWN (NAMES)
-        nbLinks = this.evaluate(function() {
-            return __utils__.findAll('#changeCityForm ul[class="optionList"] > li').length;
-        });
-        // this.echo(nbLinks + " items founds");
-
-        if (force_town_key)
-        {
-            // ON FORCE LA VILLE A CHECKER
-            names.push(force_town_key);
-        }
-        else
-        {
-            names = this.evaluate(getNames);
-            // dump(names);
-        }
-
-        // FOR EACH CITY
-        this.each(names, function(casper, name, i) {
-            this.echo('Fecthing data for ' + name + ' - ' + i);
-
-            // this.wait(1000);
-            var timeur = Math.floor((Math.random()*3000)+1);
-            this.echo('timeur = '+ timeur);
-            this.wait(timeur);
-
-            this.thenClick(x("//form[@id='changeCityForm']//ul[@class='optionList']//li[text()='"+name+"']"));
-
-            this.evaluate(function(term) {
-                document.querySelector('#citySelect').selectedIndex = term;
-                document.querySelector('#citySelect').onchange();
-            }, { term: i });
-
-            this.thenClick('#changeCityForm li[class="viewCity"] > a');
-
-            this.then(function() {
-                processPage.call(this, name);
-                // dump(mega_data);
-            });
-
-            this.then(function() {
-                // this.exit();
-            });
-        });
-    });
+    casper.get_data(true);
     // #advMilitary
     this.thenClick('#advMilitary a:first-child');
     this.then(function() {
@@ -106,6 +48,10 @@ casper.action_report = function action_report() {
 casper.action_todo = function action_todo() {
     var todo_json = JSON.parse(fs.read(todo_file));
     // dump(todo_json);
+
+    casper.get_data(false);
+    // TODO : ajouter le code du get ressource global (sans le vin et les advisors)
+    // factoriser la fonction au dessus qui recup les resources pour moduler suivants les params optionnels
 
     this.then(function() {
         if (todo_json['transport'])
@@ -130,3 +76,48 @@ casper.action_todo = function action_todo() {
         }
     });
 };
+
+casper.get_data = function get_data(wine) {
+        //  POST ADVISORS
+    this.then(function() {
+
+        // GET GLOBAL RESOURCE INFO
+        var data = this.evaluate(getGlobalInfo);
+        // dump(data);
+        mega_data['global'] = data;
+        mega_data['data'] = {
+            'resources': {},
+            'buildings': {},
+            'construction': {},
+            'wine': {}
+        };
+
+        // FOR EACH CITY
+        this.each(names, function(casper, name, i) {
+            this.echo('Fecthing data for ' + name + ' - ' + i);
+
+            // this.wait(1000);
+            var timeur = Math.floor((Math.random()*3000)+1);
+            this.echo('timeur = '+ timeur);
+            this.wait(timeur);
+
+            this.thenClick(x("//form[@id='changeCityForm']//ul[@class='optionList']//li[text()='"+name+"']"));
+
+            this.evaluate(function(term) {
+                document.querySelector('#citySelect').selectedIndex = term;
+                document.querySelector('#citySelect').onchange();
+            }, { term: i });
+
+            this.thenClick('#changeCityForm li[class="viewCity"] > a');
+
+            this.then(function() {
+                processPage.call(this, name, wine);
+                // dump(mega_data);
+            });
+
+            this.then(function() {
+                // this.exit();
+            });
+        });
+    });
+}
