@@ -291,32 +291,6 @@ class Parser():
         return self.to_mail
 
 
-def process_order(type, data):
-
-    if type == 'build':
-        process_order_build(data)
-
-    elif type == 'transport':
-        process_order_transport(data)
-
-    else:
-        print "process unknown: " + type
-
-
-def process_order_build(data):
-
-    for element in data:
-        for item in element['cargo']:
-            print "%-10s %-10s %-5d" % (element['source'], item['building'], int(item['level']))
-
-
-def process_order_transport(data):
-
-    for element in data:
-        for item in element['cargo']:
-            print "%-10s\t->\t%-10s %6s %-10s" % (element['source'], element['destination'], item['number'], item['resource'])
-
-
 fp = open('report.json')
 data = json.load(fp)
 fp.close()
@@ -330,7 +304,6 @@ p.get_wine_status(data)
 p.get_resources(data)
 
 print p.get_content()
-# print json.dumps(data, sort_keys=True, indent=4)
 
 try:
     p
