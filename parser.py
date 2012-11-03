@@ -5,6 +5,7 @@ import codecs
 import sys
 import subprocess
 import json
+import re
 from time import time
 
 streamWriter = codecs.lookup('utf-8')[-1]
@@ -75,6 +76,40 @@ class Parser():
             dict_print("%-20s %-15s %s %s" % (item['date'], item['sender'], extra, item['subject']))
 
         return 0
+
+    def parse_military_cargo_item(self, cargo):
+
+        tab = []
+
+        for cargo_item in cargo:
+            if 'ship_transport' in cargo_item['type']:
+                prefix = "%d ships: " % (int(cargo_item['number']))
+
+            if 'resources' in cargo_item['type']:
+                cargo_type = re.sub('skin/resources/icon_', '', cargo_item['type'])
+                cargo_type = re.sub('.png', '', cargo_type)
+                tab.append("%d %s" % (int(cargo_item['number']), cargo_type))
+
+        return (prefix, ", ".join(tab))
+
+    def get_military(self, data):
+
+        dict_print = self.dict_print
+
+        header = "%-20s \t%s \t%-20s \t%20s" % ('source', '->', 'destination', 'cargo')
+        dict_print('-' * 100)
+        dict_print(header)
+        dict_print('-' * 100)
+
+        for item in data:
+            (prefix, cargo) = self.parse_military_cargo_item(item['cargo'])
+            dict_print("%-20s \t%s \t%-20s \t%20s" % (item['origin'],
+                                '->',
+                                item['destination'],
+                                '%s%s' % (prefix, cargo)
+                                ))
+
+        dict_print('-' * 100)
 
     def get_resource_output(self, resource, data, output):
 
@@ -313,6 +348,9 @@ p = Parser()
 if 'construction' in data['data']:
     p.get_constructions(data['data']['construction'])
 
+if 'military' in data:
+    p.get_military(data['military'])
+
 if 'news' in data:
     p.get_news(data['news'])
 
@@ -327,6 +365,7 @@ if 'wine' in data['data']:
 
 if 'resources' in data['data']:
     p.get_resources(data['data']['resources'])
+
 
 print p.get_content()
 
