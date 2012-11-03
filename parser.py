@@ -96,20 +96,21 @@ class Parser():
 
         dict_print = self.dict_print
 
-        header = "%-20s \t%s \t%-20s \t%20s" % ('source', '->', 'destination', 'cargo')
-        dict_print('-' * 100)
+        header = "%-20s \t%-10s \t%-20s \t%-45s \t%-8s" % ('source', '->', 'destination', 'cargo', 'temps restant')
+        dict_print('-' * 150)
         dict_print(header)
-        dict_print('-' * 100)
+        dict_print('-' * 150)
 
         for item in data:
             (prefix, cargo) = self.parse_military_cargo_item(item['cargo'])
-            dict_print("%-20s \t%s \t%-20s \t%20s" % (item['origin'],
-                                '->',
+            dict_print("%-20s \t%-10s \t%-20s \t%-45s \t%-8s" % (item['origin'],
+                                re.match(r'Transport \((.*)\)', item['type']).group(1),
                                 item['destination'],
-                                '%s%s' % (prefix, cargo)
+                                '%s%s' % (prefix, cargo),
+                                item['time_left']
                                 ))
 
-        dict_print('-' * 100)
+        dict_print('-' * 150)
 
     def get_resource_output(self, resource, data, output):
 

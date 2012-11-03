@@ -72,6 +72,7 @@ casper.then(function() {
     if (action_key == 'todo')
     {
         casper.action_todo();
+        casper.action_report();
     }
 
 });
