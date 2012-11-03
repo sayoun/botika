@@ -80,9 +80,19 @@ var processBuild = function(name, cargo, index) {
                             this.thenClick('#buildingUpgrade li[class="upgrade"] > a');
                             this.echo('BUILD LAUNCHED ! '+cargo.building);
 
-                            this.echo('TODO index for item '+name +': '+ index);
+                            // TODO : check qu'on a bien upgrade jusqu'au level demande
+                            // si oui on update le todojson en mémoire
+
                             // dump(todo_json['transport'][index]);
-                            todo_json['build'][index]['done'] = true;
+                            if ((checks.level+1) == cargo.level)
+                            {
+                                todo_json['build'][index]['done'] = true;
+                                this.echo('TODO BUILD index for item '+name +': '+ index);
+                            }
+                            else
+                            {
+                                this.echo('THERE IS STILL BUILDING TO MAKE for '+name)
+                            }
                         }
                         else
                         {
@@ -131,36 +141,39 @@ casper.todo_build = function(item, names, index) {
                 this.echo('SKIPPING BUILDING ALREADY RUNNING FOR :'+item.source);
                 return false;
             }
+            else
+            {
+                var timeur = Math.floor((Math.random()*3000)+1);
+                this.echo('timeur = '+ timeur);
+                this.wait(timeur);
+
+                this.thenClick(x("//form[@id='changeCityForm']//ul[@class='optionList']//li[text()='"+item.source+"']"));
+
+                this.evaluate(function(term) {
+                        document.querySelector('#citySelect').selectedIndex = term;
+                        document.querySelector('#citySelect').onchange();
+                    }, { term: names.indexOf(item.source) });
+
+                this.thenClick('#changeCityForm li[class="viewCity"] > a');
+
+                this.then(function() {
+
+                    this.each(item['cargo'], function(self, cargo) {
+
+                        this.then(function() {
+                            processBuild.call(this, item.source, cargo, index);
+                            // dump(mega_data);
+                        });
+
+                        this.then(function() {
+                            // this.exit();
+                        });
+                    });
+                });
+            }
         }
     });
 
-    var timeur = Math.floor((Math.random()*3000)+1);
-    this.echo('timeur = '+ timeur);
-    this.wait(timeur);
-
-    this.thenClick(x("//form[@id='changeCityForm']//ul[@class='optionList']//li[text()='"+item.source+"']"));
-
-    this.evaluate(function(term) {
-            document.querySelector('#citySelect').selectedIndex = term;
-            document.querySelector('#citySelect').onchange();
-        }, { term: names.indexOf(item.source) });
-
-    this.thenClick('#changeCityForm li[class="viewCity"] > a');
-
-    this.then(function() {
-
-        this.each(item['cargo'], function(self, cargo) {
-
-            this.then(function() {
-                processBuild.call(this, item.source, cargo, index);
-                // dump(mega_data);
-            });
-
-            this.then(function() {
-                // this.exit();
-            });
-        });
-    });
 
     return [];
 }
