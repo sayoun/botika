@@ -22,7 +22,7 @@ function checkResourceForBuilding() {
     return checks;
 }
 
-var processBuild = function(name, cargo) {
+var processBuild = function(name, cargo, index) {
 
     this.echo('Process build for: '+name);
     // this.capture('test-'+name+'.png');
@@ -79,6 +79,10 @@ var processBuild = function(name, cargo) {
                             // on lance la construction
                             this.thenClick('#buildingUpgrade li[class="upgrade"] > a');
                             this.echo('BUILD LAUNCHED ! '+cargo.building);
+
+                            this.echo('TODO index for item '+name +': '+ index);
+                            // dump(todo_json['transport'][index]);
+                            todo_json['build'][index]['done'] = true;
                         }
                         else
                         {
@@ -113,17 +117,20 @@ var processBuild = function(name, cargo) {
     // });
 }
 
-casper.todo_build = function(item, names) {
+casper.todo_build = function(item, names, index) {
 
     // this.echo(item.source);
     // this.echo(item.cargo);
     // dump(item);
 
     this.then(function() {
-        if (mega_data['data']['construction'][item.source].length > 0)
+        if (mega_data['data']['construction'][item.source])
         {
-            this.echo('SKIPPING BUILDING ALREADY RUNNING FOR :'+item.source);
-            return false;
+            if (mega_data['data']['construction'][item.source].length > 0)
+            {
+                this.echo('SKIPPING BUILDING ALREADY RUNNING FOR :'+item.source);
+                return false;
+            }
         }
     });
 
@@ -145,7 +152,7 @@ casper.todo_build = function(item, names) {
         this.each(item['cargo'], function(self, cargo) {
 
             this.then(function() {
-                processBuild.call(this, item.source, cargo);
+                processBuild.call(this, item.source, cargo, index);
                 // dump(mega_data);
             });
 
@@ -158,7 +165,7 @@ casper.todo_build = function(item, names) {
     return [];
 }
 
-casper.todo_tranport = function(item, names) {
+casper.todo_tranport = function(item, names, index) {
 
     var timeur = Math.floor((Math.random()*3000)+1);
     this.echo('timeur = '+ timeur);
@@ -248,6 +255,11 @@ casper.todo_tranport = function(item, names) {
 
                         // TODO : check qu'on a bien tout envoyé
                         // si oui on update le todojson en mémoire
+                        // si non on update avec le montant restant a envoyer
+
+                        this.echo('TODO index for item '+item.source +': '+ index);
+                        // dump(todo_json['transport'][index]);
+                        todo_json['transport'][index]['done'] = true;
                     });
                 });
             });

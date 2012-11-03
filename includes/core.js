@@ -46,7 +46,7 @@ casper.action_report = function action_report() {
 }
 
 casper.action_todo = function action_todo() {
-    var todo_json = JSON.parse(fs.read(todo_file));
+    todo_json = JSON.parse(fs.read(todo_file));
     // dump(todo_json);
 
     casper.get_data(false);
@@ -58,9 +58,16 @@ casper.action_todo = function action_todo() {
         {
             this.echo('transport found !');
 
-            this.each(todo_json['transport'], function(self, item) {
+            this.each(todo_json['transport'], function(self, item, i) {
                 this.then(function() {
-                    this.todo_tranport(item, names);
+                    if (item['done'] == true)
+                    {
+                        this.echo('TODO TRANSPORT ALREADY DONE');
+                    }
+                    else
+                    {
+                        this.todo_tranport(item, names, i);
+                    }
                 });
             });
         }
@@ -68,12 +75,24 @@ casper.action_todo = function action_todo() {
         {
             this.echo('build found !');
 
-            this.each(todo_json['build'], function(self, item) {
+            this.each(todo_json['build'], function(self, item, i) {
                 this.then(function() {
-                    this.todo_build(item, names);
+                    if (item['done'] == true)
+                    {
+                        this.echo('TODO BUILD ALREADY DONE');
+                    }
+                    else
+                    {
+                        this.todo_build(item, names, i);
+                    }
                 });
             });
         }
+    });
+
+    this.then(function() {
+        // on sauve le todo.json
+        fs.write(todo_file, utils.serialize(todo_json, 4), 'w');
     });
 };
 
