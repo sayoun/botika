@@ -198,9 +198,13 @@ function getGlobalInfo() {
     // return [];
 
     var entry = {};
-    entry.ambrosia  = parseInt($('#accountAmbrosia').text());
-    entry.ships     = $('#accountTransporter').text();
-    entry.gold      = parseInt($('#value_gold').text().replace(/[^\d]/g, ''));
+    entry.ambrosia          = parseInt($('#accountAmbrosia').text());
+
+    ships_str               = $('#accountTransporter').text();
+    entry.ships_available   = parseInt(ships_str.match(/\d+/g)[0]);
+    entry.total_ships       = parseInt(ships_str.match(/\d+/g)[1]);
+
+    entry.gold              = parseInt($('#value_gold').text().replace(/[^\d]/g, ''));
 
     return entry;
 }

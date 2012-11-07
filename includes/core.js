@@ -66,7 +66,20 @@ casper.action_todo = function action_todo() {
                     }
                     else
                     {
-                        this.todo_tranport(item, names, i);
+                        // GET GLOBAL RESOURCE INFO
+                        var data = this.evaluate(getGlobalInfo);
+                        // dump(data);
+                        mega_data['global'] = data;
+
+                        if (mega_data['global']['ships_available'] == 0)
+                        {
+                            // no ship at all
+                            this.echo('NOT ENOUGH SHIPS TO SEND, ABORT !');
+                        }
+                        else
+                        {
+                            this.todo_tranport(item, names, i);
+                        }
                     }
                 });
             });

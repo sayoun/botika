@@ -245,13 +245,13 @@ class Parser():
                     # print "%s %s" % (building, level)
                     building_list[building][city] = level
 
-        header = "%-10s \t%-10s \t%6s \t%10s \t%10s \t%10s \t%10s" % ('City', 'townhall', 'rdg', 'museum', 'tavern', 'safehouse', 'wall')
-        dict_print('-' * 100)
+        header = "%-10s \t%-10s \t%8s \t%10s \t%10s \t%10s \t%10s" % ('City', 'townhall', 'rdg', 'museum', 'tavern', 'safehouse', 'wall')
+        dict_print('-' * 110)
         dict_print(header)
-        dict_print('-' * 100)
+        dict_print('-' * 110)
 
         for city in data:
-            dict_print("%-10s \t%10s \t%6s \t%10s \t%10s \t%10s \t%10s" % (city,
+            dict_print("%-10s \t%10s \t%8s \t%10s \t%10s \t%10s \t%10s" % (city,
                                                 building_list['townHall'].get(city, '-'),
                                                 building_list['palaceColony'].get(city, building_list['palace'].get(city, '-')),
                                                 building_list['museum'].get(city, '-'),
@@ -260,13 +260,13 @@ class Parser():
                                                 building_list['wall'].get(city, '-'))
             )
 
-        header = "%-10s \t%-10s \t%6s \t%10s \t%10s \t%10s \t%10s" % ('City', 'academy', 'dump', 'warehouse', 'port', 'shipyard', 'barracks')
-        dict_print('-' * 100)
+        header = "%-10s \t%-10s \t%8s \t%10s \t%8s \t%10s \t%10s" % ('City', 'academy', 'dump', 'warehouse', 'port', 'shipyard', 'barracks')
+        dict_print('-' * 110)
         dict_print(header)
-        dict_print('-' * 100)
+        dict_print('-' * 110)
 
         for city in data:
-            dict_print("%-10s \t%10s \t%6s \t%10s \t%10s \t%10s \t%10s" % (city,
+            dict_print("%-10s \t%10s \t%8s \t%10s \t%8s \t%10s \t%10s" % (city,
                                                 building_list['academy'].get(city, '-'),
                                                 building_list['dump'].get(city, '-'),
                                                 building_list['warehouse'].get(city, '-'),
@@ -276,9 +276,9 @@ class Parser():
             )
 
         header = "%-10s \t%-10s \t%10s \t%10s \t%10s \t%10s" % ('City', 'forester', 'glassblowing', 'winegrower', 'alchemist', 'stonemason')
-        dict_print('-' * 100)
+        dict_print('-' * 110)
         dict_print(header)
-        dict_print('-' * 100)
+        dict_print('-' * 110)
 
         for city in data:
             dict_print("%-10s \t%10s \t%10s \t%10s \t%10s \t%10s" % (city,
@@ -291,9 +291,9 @@ class Parser():
             )
 
         header = "%-10s \t%-10s \t%10s \t%10s \t%10s \t%10s" % ('City', 'carpentering', 'architect', 'fireworker', 'vineyard', 'optician')
-        dict_print('-' * 100)
+        dict_print('-' * 110)
         dict_print(header)
-        dict_print('-' * 100)
+        dict_print('-' * 110)
 
         for city in data:
             dict_print("%-10s \t%10s \t%10s \t%10s \t%10s \t%10s" % (city,
