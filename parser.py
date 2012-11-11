@@ -181,12 +181,17 @@ class Parser():
         dict_print(header)
         dict_print('-' * 100)
 
+        total_wine_used, total_wine_current = 0, 0
+
         for item in data:
                 extra = ''
                 if 'empty' in data[item]:
                     if data[item].get('empty', 0) < 5:
                         extra = '<- ** WARNING **'
                         self.to_mail = True
+
+                total_wine_current += data[item].get('wine_current', 0)
+                total_wine_used += data[item].get('wine_used', 0)
 
                 dict_print("%-10s \t%12s \t%12s \t%12s %s" % (item,
                                                     data[item].get('wine_current', 0),
@@ -195,7 +200,12 @@ class Parser():
                                                     extra
                                                     ))
         dict_print('-' * 100)
+        dict_print("%-10s \t%12s \t%12s \t%12s" % ('Total',
+                                    total_wine_current,
+                                    total_wine_used,
+                                    '-'))
 
+        dict_print('-' * 100)
         return 0
 
     def get_buildings(self, data):
