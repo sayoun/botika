@@ -201,7 +201,7 @@ casper.todo_tranport = function(item, names, index) {
         {
             this.thenClick('#mainview > #locations > li[class="port"] > a');
             this.then(function() {
-                this.capture('port1.png');
+                // this.capture('port1.png');
 
                 // AUTO ACCEPT SHIP BUYOUT
                 if (this.exists('div[class="forminput"] > a'))
@@ -212,7 +212,7 @@ casper.todo_tranport = function(item, names, index) {
                 // CLICK ON THE TOWN ICON
                 this.thenClick('#mainview > div[class="contentBox01h"] li[title="'+item.destination+'"] > a');
                 this.then(function() {
-                    this.capture('port2.png');
+                    // this.capture('port2.png');
 
                     var entry = {};
                     var total_cargo_to_send = 0;
@@ -294,7 +294,7 @@ casper.todo_tranport = function(item, names, index) {
                     this.fill('#mainview > form', entry, false);
 
                     this.then(function() {
-                        this.capture('port3.png');
+                        // this.capture('port3.png');
                         this.echo(this.fetchText('#arrival'));
 
                         // on submit !
@@ -303,7 +303,7 @@ casper.todo_tranport = function(item, names, index) {
 
                     this.then(function() {
                         // post submit
-                        this.capture('port4.png');
+                        // this.capture('port4.png');
 
                         if (this.exists('#mainview ul[class="error"]'))
                         {

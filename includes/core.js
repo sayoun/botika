@@ -24,7 +24,8 @@ casper.action_report = function action_report() {
         mega_data.diplomacy = diplomacy;
 
         // AUTO ACCEPT CULTURAL TREATY
-        if (this.exists('div[class="reaction"]')) {
+        // TODO : if multiple entries loop on each one
+        if (this.exists('div[class="reaction"] a[class="answerYes"]')) {
             this.thenClick('div[class="reaction"] a[class="answerYes"]');
 
             this.then(function() {
