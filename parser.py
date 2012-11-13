@@ -252,8 +252,12 @@ class Parser():
                 # print "item", item
                 for building in item:
                     level = item[building]
-                    # print "%s %s" % (building, level)
-                    building_list[building][city] = level
+                    # print "%s %s %s" % (city, building, level)
+                    # building already listed, likely a port
+                    if city in building_list[building]:
+                        building_list[building][city] += ',' + level
+                    else:
+                        building_list[building][city] = level
 
         header = "%-10s \t%-10s \t%8s \t%10s \t%10s \t%10s \t%10s" % ('City', 'townhall', 'rdg', 'museum', 'tavern', 'safehouse', 'wall')
         dict_print('-' * 110)
