@@ -14,6 +14,8 @@ var fs = require('fs');
 var x = require('casper').selectXPath;
 var account_file = 'account.json';
 var account_info = {};
+var bookmark_file = 'bookmark.json';
+var bookmark_info = {};
 var force_town_key = false;
 
 phantom.injectJs('includes/cli.js');
@@ -26,7 +28,6 @@ casper.cli_check();
 var filename_to_dump = 'report.json';
 var todo_file = 'todo.json';
 var mega_data = {};
-
 
 casper.start('http://fr.ikariam.com', function() {
 

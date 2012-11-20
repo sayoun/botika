@@ -200,135 +200,277 @@ casper.todo_tranport = function(item, names, index) {
 
     this.thenClick('#changeCityForm li[class="viewCity"] > a');
 
-    this.then(function() {
+    if (item.bookmark)
+    {
+        this.echo('BOOKMARK needed for: '+item.destination);
 
-        if (this.exists('#mainview > #locations > li[class="port"] > a'))
-        {
-            this.thenClick('#mainview > #locations > li[class="port"] > a');
+        info = item.destination.split('/');
+        bk_index = info[0];
+        bk_city_name = info[1];
+        bk_city_info = bookmark_info[bk_index][bk_city_name];
+        this.echo('BOOKMARK island_id: '+bk_city_info.island_id+' town_id: '+bk_city_info.town_id);
+
+        this.thenOpen('http://m16.fr.ikariam.com/index.php?view=island&id='+bk_city_info.island_id).then(function() {
+
             this.then(function() {
-                // this.capture('port1.png');
+                this.capture('bookmark_island_1.png');
+            });
 
-                // AUTO ACCEPT SHIP BUYOUT
-                if (this.exists('div[class="forminput"] > a'))
+            this.thenClick('#'+bk_city_info.town_id);
+
+            this.then(function() {
+                this.capture('bookmark_island_2.png');
+            });
+
+            this.thenClick('#actions li[class="transport "] a');
+
+            this.then(function() {
+                this.capture('bookmark_island_3.png');
+            });
+
+        });
+
+        this.then(function() {
+            // this.capture('port2.png');
+
+            var entry = {};
+            var total_cargo_to_send = 0;
+            var cargo_max_capacity = mega_data['global']['ships_available'] * 500;
+            var skipping = false;
+            var partial_load = false;
+
+            this.each(item['cargo'], function(self, cargo, cargo_index) {
+                // cargo_resource   = wood
+                // cargo_tradegood1 = wine
+                // cargo_tradegood2 = marble
+                // cargo_tradegood3 = glass
+                // cargo_tradegood4 = sulfur
+
+                if (!skipping)
                 {
-                    this.thenClick('div[class="forminput"] > a');
-                };
+                    var field_name = '';
+                    if (cargo.resource == 'wood')
+                    {
+                        field_name = 'cargo_resource';
+                    }
+                    if (cargo.resource == 'wine')
+                    {
+                        field_name = 'cargo_tradegood1';
+                    }
+                    if (cargo.resource == 'marble')
+                    {
+                        field_name = 'cargo_tradegood2';
+                    }
+                    if (cargo.resource == 'glass')
+                    {
+                        field_name = 'cargo_tradegood3';
+                    }
+                    if (cargo.resource == 'sulfur')
+                    {
+                        field_name = 'cargo_tradegood4';
+                    }
 
-                // CLICK ON THE TOWN ICON
-                this.thenClick('#mainview > div[class="contentBox01h"] li[title="'+item.destination+'"] > a');
+                    if (!this.exists('#mainview > form input[name="'+field_name+'"]'))
+                    {
+                        this.echo(item.source+' has no resource '+cargo.resource);
+                        return;
+                    }
+
+                    // total_cargo_to_send += cargo.number;
+                    var cargo_space_left = cargo_max_capacity - total_cargo_to_send;
+
+                    // some space left to load cargo in full ?
+                    if ((total_cargo_to_send + cargo.number) <= cargo_max_capacity)
+                    {
+                        this.echo('ok to load cargo, enough ships availables: '+mega_data['global']['ships_available']);
+
+                        total_cargo_to_send += cargo.number;
+                        entry[field_name] = cargo.number;
+
+                        todo_json['transport'][index]['cargo'][cargo_index]['number'] = 0;
+                    }
+                    else if ( (cargo_space_left > 0) && (cargo_space_left <= cargo.number) )
+                    {
+                        // can we load at least some part of the cargo
+                        this.echo('loading partial cargo: '+cargo_space_left+' < '+cargo.number);
+
+                        total_cargo_to_send += cargo_space_left;
+                        entry[field_name] = cargo_space_left;
+
+                        todo_json['transport'][index]['cargo'][cargo_index]['number'] -= cargo_space_left;
+
+                        partial_load = true;
+                    }
+                    else
+                    {
+                        // only load this cargo and skip the rest
+                        skipping = true;
+                    }
+                }
+            }); // EACH
+
+            // fill the form
+            this.fill('#mainview > form', entry, false);
+
+            this.then(function() {
+                // this.capture('port3.png');
+                this.echo(this.fetchText('#arrival'));
+
+                // on submit !
+                this.thenClick('#submit');
+            });
+
+            this.then(function() {
+                // post submit
+                // this.capture('port4.png');
+
+                if (this.exists('#mainview ul[class="error"]'))
+                {
+                    // transport failed
+                    this.echo('Transport FAILED :'+this.fetchText('#mainview ul[class="error"]'));
+                }
+                else
+                {
+                    // update the todo.json only if not skipped data
+                    if (!skipping && !partial_load)
+                    {
+                        this.echo('TODO TRANSPORT index to update for item '+item.source +': '+ index);
+                        todo_json['transport'][index]['done'] = true;
+                    }
+                }
+            });
+        });
+    }
+    else {
+        this.then(function() {
+
+            if (this.exists('#mainview > #locations > li[class="port"] > a'))
+            {
+                this.thenClick('#mainview > #locations > li[class="port"] > a');
                 this.then(function() {
-                    // this.capture('port2.png');
+                    // this.capture('port1.png');
 
-                    var entry = {};
-                    var total_cargo_to_send = 0;
-                    var cargo_max_capacity = mega_data['global']['ships_available'] * 500;
-                    var skipping = false;
-                    var partial_load = false;
+                    // AUTO ACCEPT SHIP BUYOUT
+                    if (this.exists('div[class="forminput"] > a'))
+                    {
+                        this.thenClick('div[class="forminput"] > a');
+                    };
 
-                    this.each(item['cargo'], function(self, cargo, cargo_index) {
-                        // cargo_resource   = wood
-                        // cargo_tradegood1 = wine
-                        // cargo_tradegood2 = marble
-                        // cargo_tradegood3 = glass
-                        // cargo_tradegood4 = sulfur
+                    // CLICK ON THE TOWN ICON
+                    this.thenClick('#mainview > div[class="contentBox01h"] li[title="'+item.destination+'"] > a');
+                    this.then(function() {
+                        // this.capture('port2.png');
 
-                        if (!skipping)
-                        {
-                            var field_name = '';
-                            if (cargo.resource == 'wood')
+                        var entry = {};
+                        var total_cargo_to_send = 0;
+                        var cargo_max_capacity = mega_data['global']['ships_available'] * 500;
+                        var skipping = false;
+                        var partial_load = false;
+
+                        this.each(item['cargo'], function(self, cargo, cargo_index) {
+                            // cargo_resource   = wood
+                            // cargo_tradegood1 = wine
+                            // cargo_tradegood2 = marble
+                            // cargo_tradegood3 = glass
+                            // cargo_tradegood4 = sulfur
+
+                            if (!skipping)
                             {
-                                field_name = 'cargo_resource';
+                                var field_name = '';
+                                if (cargo.resource == 'wood')
+                                {
+                                    field_name = 'cargo_resource';
+                                }
+                                if (cargo.resource == 'wine')
+                                {
+                                    field_name = 'cargo_tradegood1';
+                                }
+                                if (cargo.resource == 'marble')
+                                {
+                                    field_name = 'cargo_tradegood2';
+                                }
+                                if (cargo.resource == 'glass')
+                                {
+                                    field_name = 'cargo_tradegood3';
+                                }
+                                if (cargo.resource == 'sulfur')
+                                {
+                                    field_name = 'cargo_tradegood4';
+                                }
+
+                                if (!this.exists('#mainview > form input[name="'+field_name+'"]'))
+                                {
+                                    this.echo(item.source+' has no resource '+cargo.resource);
+                                    return;
+                                }
+
+                                // total_cargo_to_send += cargo.number;
+                                var cargo_space_left = cargo_max_capacity - total_cargo_to_send;
+
+                                // some space left to load cargo in full ?
+                                if ((total_cargo_to_send + cargo.number) <= cargo_max_capacity)
+                                {
+                                    this.echo('ok to load cargo, enough ships availables: '+mega_data['global']['ships_available']);
+
+                                    total_cargo_to_send += cargo.number;
+                                    entry[field_name] = cargo.number;
+
+                                    todo_json['transport'][index]['cargo'][cargo_index]['number'] = 0;
+                                }
+                                else if ( (cargo_space_left > 0) && (cargo_space_left <= cargo.number) )
+                                {
+                                    // can we load at least some part of the cargo
+                                    this.echo('loading partial cargo: '+cargo_space_left+' < '+cargo.number);
+
+                                    total_cargo_to_send += cargo_space_left;
+                                    entry[field_name] = cargo_space_left;
+
+                                    todo_json['transport'][index]['cargo'][cargo_index]['number'] -= cargo_space_left;
+
+                                    partial_load = true;
+                                }
+                                else
+                                {
+                                    // only load this cargo and skip the rest
+                                    skipping = true;
+                                }
                             }
-                            if (cargo.resource == 'wine')
+                        }); // EACH
+
+                        // fill the form
+                        this.fill('#mainview > form', entry, false);
+
+                        this.then(function() {
+                            // this.capture('port3.png');
+                            this.echo(this.fetchText('#arrival'));
+
+                            // on submit !
+                            this.thenClick('#submit');
+                        });
+
+                        this.then(function() {
+                            // post submit
+                            // this.capture('port4.png');
+
+                            if (this.exists('#mainview ul[class="error"]'))
                             {
-                                field_name = 'cargo_tradegood1';
-                            }
-                            if (cargo.resource == 'marble')
-                            {
-                                field_name = 'cargo_tradegood2';
-                            }
-                            if (cargo.resource == 'glass')
-                            {
-                                field_name = 'cargo_tradegood3';
-                            }
-                            if (cargo.resource == 'sulfur')
-                            {
-                                field_name = 'cargo_tradegood4';
-                            }
-
-                            if (!this.exists('#mainview > form input[name="'+field_name+'"]'))
-                            {
-                                this.echo(item.source+' has no resource '+cargo.resource);
-                                return;
-                            }
-
-                            // total_cargo_to_send += cargo.number;
-                            var cargo_space_left = cargo_max_capacity - total_cargo_to_send;
-
-                            // some space left to load cargo in full ?
-                            if ((total_cargo_to_send + cargo.number) <= cargo_max_capacity)
-                            {
-                                this.echo('ok to load cargo, enough ships availables: '+mega_data['global']['ships_available']);
-
-                                total_cargo_to_send += cargo.number;
-                                entry[field_name] = cargo.number;
-
-                                todo_json['transport'][index]['cargo'][cargo_index]['number'] = 0;
-                            }
-                            else if ( (cargo_space_left > 0) && (cargo_space_left <= cargo.number) )
-                            {
-                                // can we load at least some part of the cargo
-                                this.echo('loading partial cargo: '+cargo_space_left+' < '+cargo.number);
-
-                                total_cargo_to_send += cargo_space_left;
-                                entry[field_name] = cargo_space_left;
-
-                                todo_json['transport'][index]['cargo'][cargo_index]['number'] -= cargo_space_left;
-
-                                partial_load = true;
+                                // transport failed
+                                this.echo('Transport FAILED :'+this.fetchText('#mainview ul[class="error"]'));
                             }
                             else
                             {
-                                // only load this cargo and skip the rest
-                                skipping = true;
+                                // update the todo.json only if not skipped data
+                                if (!skipping && !partial_load)
+                                {
+                                    this.echo('TODO TRANSPORT index to update for item '+item.source +': '+ index);
+                                    todo_json['transport'][index]['done'] = true;
+                                }
                             }
-                        }
-                    }); // EACH
-
-                    // fill the form
-                    this.fill('#mainview > form', entry, false);
-
-                    this.then(function() {
-                        // this.capture('port3.png');
-                        this.echo(this.fetchText('#arrival'));
-
-                        // on submit !
-                        this.thenClick('#submit');
-                    });
-
-                    this.then(function() {
-                        // post submit
-                        // this.capture('port4.png');
-
-                        if (this.exists('#mainview ul[class="error"]'))
-                        {
-                            // transport failed
-                            this.echo('Transport FAILED :'+this.fetchText('#mainview ul[class="error"]'));
-                        }
-                        else
-                        {
-                            // update the todo.json only if not skipped data
-                            if (!skipping && !partial_load)
-                            {
-                                this.echo('TODO TRANSPORT index to update for item '+item.source +': '+ index);
-                                todo_json['transport'][index]['done'] = true;
-                            }
-                        }
+                        });
                     });
                 });
-            });
-        }
-    });
-
+            }
+        });
+    }
     return [];
 };

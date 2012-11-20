@@ -15,6 +15,8 @@ casper.cli_check = function cli_check() {
     {
         var account_json = JSON.parse(fs.read(account_file));
         account_info = account_json[casper.cli.options['login']];
+
+        bookmark_info = JSON.parse(fs.read(bookmark_file));
     }
     else
     {
