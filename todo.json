@@ -1,23 +1,82 @@
 {
     "build": [
         {
-            "source": "Polis",
             "cargo": [
                 {
-                    "building":"architect",
-                    "level":"20"
+                    "building": "safehouse",
+                    "level": 32
                 }
-            ]
+            ],
+            "source": "Sonic"
+        },
+        {
+            "cargo": [
+                {
+                    "building": "wall",
+                    "level": 20
+                }
+            ],
+            "source": "Sonic"
+        },
+        {
+            "cargo": [
+                {
+                    "building": "wall",
+                    "level": 20
+                }
+            ],
+            "source": "Cain"
+        },
+        {
+            "cargo": [
+                {
+                    "building": "townHall",
+                    "level": 10
+                }
+            ],
+            "source": "Polis",
+            "done": true
+        },
+        {
+            "cargo": [
+                {
+                    "building": "optician",
+                    "level": 20
+                }
+            ],
+            "source": "Polis"
         }
     ],
     "transport": [
         {
-            "source": "Tyrion",
-            "destination" : "Polis",
             "cargo": [
-                {"resource" : "wine",
-                 "number" : "1000"}
-            ]
+                {
+                    "number": 80500,
+                    "resource": "marble"
+                }
+            ],
+            "destination": "Cain",
+            "source": "Jack"
+        },
+        {
+            "cargo": [
+                {
+                    "number": 80500,
+                    "resource": "marble"
+                }
+            ],
+            "destination": "Kratos",
+            "source": "Mario"
+        },
+        {
+            "cargo": [
+                {
+                    "number": 80500,
+                    "resource": "marble"
+                }
+            ],
+            "destination": "Sonic",
+            "source": "Jack"
         }
     ]
 }

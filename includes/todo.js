@@ -63,13 +63,14 @@ var processBuild = function(name, cargo, index) {
                         // on va checker qu'on a assez de chaque resource
                         this.each(checks.needed, function(self, resource)
                         {
+                            resource_actual = mega_data['data']['resources'][name][resource.name]['value'];
                             if ( resource.value <= mega_data['data']['resources'][name][resource.name]['value'] )
                             {
-                                this.echo('OK for '+resource.name);
+                                this.echo('OK for: '+resource.name+' actual:'+resource_actual+' needed:'+resource.value);
                             }
                             else
                             {
-                                this.echo('NOK for: '+resource.name);
+                                this.echo('NOK for: '+resource.name+ ' actual:'+resource_actual+' needed:'+resource.value+' diff:'+(resource.value-resource_actual));
                                 ok = false;
                             }
                         });
@@ -102,7 +103,11 @@ var processBuild = function(name, cargo, index) {
                     }
                     else
                     {
-                        this.echo('building level NOK');
+                        this.echo('building level NOK, actual:'+checks.level+' needed:'+cargo.level);
+                        if (checks.level >= cargo.level)
+                        {
+                            todo_json['build'][index]['done'] = true;
+                        }
                     }
                 }
             }
