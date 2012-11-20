@@ -41,18 +41,19 @@
         {
             "cargo": [
                 {
-                    "number": 0,
-                    "resource": "marble"
+                    "number": 77000,
+                    "resource": "glass"
                 }
             ],
-            "destination": "Cain",
+            "destination": "shandalar/Sayan",
+            "bookmark": true,
             "source": "Jack",
             "done": true
         },
         {
             "cargo": [
                 {
-                    "number": 80500,
+                    "number": 80000,
                     "resource": "marble"
                 }
             ],
@@ -62,7 +63,7 @@
         {
             "cargo": [
                 {
-                    "number": 80500,
+                    "number": 80000,
                     "resource": "marble"
                 }
             ],

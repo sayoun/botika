@@ -1,0 +1,48 @@
+{
+    "shandalar": {
+            "Sayan": {
+                "island_id": "4866",
+                "town_id": "city_17354"
+            },
+            "Elderel": {
+                "island_id": "4866",
+                "town_id": "city_65058"
+            },
+            "Shandalar": {
+                "island_id": "4866",
+                "town_id": "city_15357"
+            },
+            "Alindra": {
+                "island_id": "4866",
+                "town_id": "city_45424"
+            },
+            "Bizzkit": {
+                "island_id": "4866",
+                "town_id": "city_73666"
+            },
+            "Korangar": {
+                "island_id": "4866",
+                "town_id": "city_19586"
+            },
+            "Lysandron": {
+                "island_id": "4866",
+                "town_id": "city_36372"
+            },
+            "Ironwill": {
+                "island_id": "4866",
+                "town_id": "city_76657"
+            },
+            "Tigrousore": {
+                "island_id": "4866",
+                "town_id": "city_80568"
+            },
+            "Chandrakauns": {
+                "island_id": "4866",
+                "town_id": "city_82955"
+            },
+            "Enia": {
+                "island_id": "4865",
+                "town_id": "city_26649"
+            }
+        }
+}
