@@ -30,16 +30,6 @@
         {
             "cargo": [
                 {
-                    "building": "townHall",
-                    "level": 10
-                }
-            ],
-            "source": "Polis",
-            "done": true
-        },
-        {
-            "cargo": [
-                {
                     "building": "optician",
                     "level": 20
                 }
@@ -51,12 +41,13 @@
         {
             "cargo": [
                 {
-                    "number": 80500,
+                    "number": 0,
                     "resource": "marble"
                 }
             ],
             "destination": "Cain",
-            "source": "Jack"
+            "source": "Jack",
+            "done": true
         },
         {
             "cargo": [
