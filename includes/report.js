@@ -96,6 +96,8 @@ function getDiplomacyInfo() {
 
     $('tr[id^="message"]').each(function()
         {
+            current_id = $(this).attr('id').replace(/[^\d]/g, '');
+
             var entry = {};
 
             if ($(this).hasClass('new'))
@@ -107,6 +109,8 @@ function getDiplomacyInfo() {
             entry.subject = $('td:eq(3)',this).text();
             entry.source  = $('td:eq(4)',this).text();
             entry.date    = $('td:eq(5)',this).text();
+
+            entry.content = $('#tbl_mail'+current_id).text().trim();
 
             diplo.push(entry);
         });

@@ -74,6 +74,7 @@ class Parser():
                 extra = '(*)'
 
             dict_print("%-20s %-15s %s %s" % (item['date'], item['sender'], extra, item['subject']))
+            dict_print("\t%s" % item['content'].replace('\n', '\n\t'))
 
         return 0
 
