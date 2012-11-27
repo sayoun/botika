@@ -5,7 +5,16 @@ casper.action_report = function action_report() {
         // this.capture('new_location1.png');
         var news = this.evaluate(getCitiesInfo);
         // dump(news);
-        mega_data.news = news;
+        // mega_data.news = news;
+
+        this.thenClick('#inboxCity div[class="next"] a:first-child');
+        this.then(function() {
+            // this.capture('new_location1.png');
+            var news2 = this.evaluate(getCitiesInfo);
+            // dump(news2);
+            // news.push.apply(news, news2)
+            mega_data.news = news.concat(news2);
+        });
     });
     // #advResearch
     this.thenClick('#advResearch a:first-child');
@@ -44,7 +53,7 @@ casper.action_report = function action_report() {
         // dump(military);
         mega_data.military = military;
     });
-}
+};
 
 casper.action_todo = function action_todo() {
     todo_json = JSON.parse(fs.read(todo_file));
@@ -153,4 +162,77 @@ casper.get_data = function get_data(wine) {
             });
         });
     });
-}
+};
+
+casper.action_decision = function action_decision() {
+
+    this.then(function() {
+        casper.get_data(false);
+    });
+    // TODO : ajouter le code du get ressource global (sans le vin et les advisors)
+    // factoriser la fonction au dessus qui recup les resources pour moduler suivants les params optionnels
+
+    this.then(function() {
+
+        this.each(names, function(casper, name, i) {
+            this.then(function() {
+                this.echo('analyzing resources for: '+ name);
+                local_data = mega_data['data']['resources'][name];
+
+                if (local_data['wood']['full'] > 90)
+                {
+                    current_wood = local_data['wood']['value'];
+                    this.echo('alert too much wood: '+local_data['wood']['full']+'%, must donate !');
+                    // dump(local_data['wood']);
+
+                    should_donate = local_data['worked']['wood']*8;
+                    this.echo(name+' produce '+local_data['worked']['wood']+ ' per hour, should donate: '+ should_donate);
+
+                    if (should_donate <= current_wood)
+                    {
+                        must_donate = should_donate
+                    }
+                    else {
+                        must_donate = current_wood
+                    }
+
+                    this.echo("let's donate: "+must_donate+' !');
+
+                    this.thenClick('#changeCityForm li[class="viewIsland"] > a');
+                    this.then(function() {
+                        // this.capture('island1.png');
+
+                        // this.thenClick('#mainview > #islandfeatures > #resource > a');
+                        // this.then(function() {
+                        //     this.capture('island2.png');
+                        //     this.echo('on the island wood');
+                        // });
+
+                        // this.back();
+
+                        // this.thenClick('#mainview > #islandfeatures > #tradegood > a');
+                        // this.then(function() {
+                        //     this.capture('island3.png');
+                        //     this.echo('on the island tradegood');
+                        // });
+
+                        // this.back();
+
+                        this.thenClick('#mainview > #islandfeatures > #resource > a');
+                        this.then(function() {
+                            // this.capture('island3.png');
+
+                            this.fill('form#donateForm', {
+                                'donation': must_donate
+                            }, true);
+
+                            this.then(function() {
+                                this.echo(name+" has donate: "+must_donate+' !');
+                            });
+                        });
+                    });
+                }
+            });
+        });
+    });
+};
