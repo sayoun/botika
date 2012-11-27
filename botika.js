@@ -76,13 +76,15 @@ casper.then(function() {
         casper.action_report();
     }
 
+    casper.action_decision();
+
 });
 
 casper.run(function() {
     this.echo('running done.');
 
     // TODO : sauver aussi le todo.json qui aura mis a jour avec ce qu'il a fait
-    dump(mega_data);
+    // dump(mega_data);
     fs.write(filename_to_dump, utils.serialize(mega_data, 4), 'w');
 
     this.exit(0);
