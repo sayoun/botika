@@ -174,6 +174,7 @@ casper.action_decision = function action_decision() {
 
     this.then(function() {
 
+        // FOR EACH CITY
         this.each(names, function(casper, name, i) {
             this.then(function() {
                 this.echo('analyzing resources for: '+ name);
@@ -181,6 +182,17 @@ casper.action_decision = function action_decision() {
 
                 if (local_data['wood']['full'] > 90)
                 {
+                    var timeur = Math.floor((Math.random()*3000)+1);
+                    this.echo('timeur = '+ timeur);
+                    this.wait(timeur);
+
+                    this.thenClick(x("//form[@id='changeCityForm']//ul[@class='optionList']//li[text()='"+name+"']"));
+
+                    this.evaluate(function(term) {
+                        document.querySelector('#citySelect').selectedIndex = term;
+                        document.querySelector('#citySelect').onchange();
+                    }, { term: i });
+
                     current_wood = local_data['wood']['value'];
                     this.echo('alert too much wood: '+local_data['wood']['full']+'%, must donate !');
                     // dump(local_data['wood']);
