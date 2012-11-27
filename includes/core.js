@@ -193,23 +193,27 @@ casper.action_decision = function action_decision() {
                         document.querySelector('#citySelect').onchange();
                     }, { term: i });
 
-                    current_wood = local_data['wood']['value'];
-                    this.echo('alert too much wood: '+local_data['wood']['full']+'%, must donate !');
-                    // dump(local_data['wood']);
+                    this.thenClick('#changeCityForm li[class="viewCity"] > a');
 
-                    should_donate = local_data['worked']['wood']*8;
-                    this.echo(name+' produce '+local_data['worked']['wood']+ ' per hour, should donate: '+ should_donate);
+                    this.then(function() {
+                        current_wood = local_data['wood']['value'];
+                        this.echo('alert too much wood: '+local_data['wood']['full']+'%, must donate !');
+                        // dump(local_data['wood']);
 
-                    if (should_donate <= current_wood)
-                    {
-                        must_donate = should_donate
-                    }
-                    else {
-                        must_donate = current_wood
-                    }
+                        should_donate = local_data['worked']['wood']*8;
+                        this.echo(name+' produce '+local_data['worked']['wood']+ ' per hour, should donate: '+ should_donate);
 
-                    this.echo("let's donate: "+must_donate+' !');
+                        if (should_donate <= current_wood)
+                        {
+                            must_donate = should_donate
+                        }
+                        else {
+                            must_donate = current_wood
+                        }
 
+                        this.echo("let's donate: "+must_donate+' !');
+                    });
+                    
                     this.thenClick('#changeCityForm li[class="viewIsland"] > a');
                     this.then(function() {
                         // this.capture('island1.png');
