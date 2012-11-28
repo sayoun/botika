@@ -3,8 +3,8 @@ var casper = require('casper').create({
         width: 1024,
         height: 768
     },
-    logLevel: 'debug',
-    verbose: true,
+    // logLevel: 'debug',
+    // verbose: true,
     clientScripts: ["includes/jquery-1.8.2.min.js"]
 });
 
@@ -76,7 +76,10 @@ casper.then(function() {
         casper.action_report();
     }
 
-    casper.action_decision();
+    if ((action_key == 'report') || (action_key == 'todo'))
+    {
+        casper.action_decision();
+    }
 
 });
 

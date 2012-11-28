@@ -166,9 +166,6 @@ casper.get_data = function get_data(wine) {
 
 casper.action_decision = function action_decision() {
 
-    this.then(function() {
-        casper.get_data(false);
-    });
     // TODO : ajouter le code du get ressource global (sans le vin et les advisors)
     // factoriser la fonction au dessus qui recup les resources pour moduler suivants les params optionnels
 
@@ -181,53 +178,101 @@ casper.action_decision = function action_decision() {
 
                 if (local_data['wood']['full'] > 90)
                 {
-                    current_wood = local_data['wood']['value'];
-                    this.echo('alert too much wood: '+local_data['wood']['full']+'%, must donate !');
-                    // dump(local_data['wood']);
+                    var timeur = Math.floor((Math.random()*3000)+1);
+                    this.echo('timeur = '+ timeur);
+                    this.wait(timeur);
 
-                    should_donate = local_data['worked']['wood']*8;
-                    this.echo(name+' produce '+local_data['worked']['wood']+ ' per hour, should donate: '+ should_donate);
+                    this.thenClick(x("//form[@id='changeCityForm']//ul[@class='optionList']//li[text()='"+name+"']"));
 
-                    if (should_donate <= current_wood)
-                    {
-                        must_donate = should_donate
-                    }
-                    else {
-                        must_donate = current_wood
-                    }
+                    this.evaluate(function(term) {
+                        document.querySelector('#citySelect').selectedIndex = term;
+                        document.querySelector('#citySelect').onchange();
+                    }, { term: i });
 
-                    this.echo("let's donate: "+must_donate+' !');
+                    this.thenClick('#changeCityForm li[class="viewCity"] > a');
+
+                    this.then(function() {
+                        current_wood = local_data['wood']['value'];
+                        this.echo('alert too much wood: '+local_data['wood']['full']+'%, must donate !');
+                        // dump(local_data['wood']);
+
+                        should_donate = local_data['worked']['wood']*8;
+                        this.echo(name+' produce '+local_data['worked']['wood']+ ' per hour, should donate: '+ should_donate);
+
+                        if (should_donate <= current_wood)
+                        {
+                            must_donate = should_donate
+                        }
+                        else {
+                            must_donate = current_wood
+                        }
+
+                        this.echo("let's donate: "+must_donate+' !');
+                    });
 
                     this.thenClick('#changeCityForm li[class="viewIsland"] > a');
                     this.then(function() {
                         // this.capture('island1.png');
 
-                        // this.thenClick('#mainview > #islandfeatures > #resource > a');
-                        // this.then(function() {
-                        //     this.capture('island2.png');
-                        //     this.echo('on the island wood');
-                        // });
-
-                        // this.back();
-
-                        // this.thenClick('#mainview > #islandfeatures > #tradegood > a');
-                        // this.then(function() {
-                        //     this.capture('island3.png');
-                        //     this.echo('on the island tradegood');
-                        // });
-
-                        // this.back();
+                        to_complete_tradegood = 0;
+                        to_complete_wood = 0;
 
                         this.thenClick('#mainview > #islandfeatures > #resource > a');
                         this.then(function() {
-                            // this.capture('island3.png');
+                            // this.capture('island2.png');
+                            this.echo('on the island wood');
 
-                            this.fill('form#donateForm', {
-                                'donation': must_donate
-                            }, true);
+                            max_mine_wood = this.fetchText('#resUpgrade div[class="content"] > ul[class="resources"] li[class="wood"]').replace(/[^\d]/g, '');
+                            current_mine_wood = this.fetchText('#resUpgrade div[class="content"] > div > ul[class="resources"] li[class="wood"]').replace(/[^\d]/g, '');
+                            to_complete_wood = max_mine_wood-current_mine_wood;
+                            this.echo('wood mine: max:'+max_mine_wood+' current:'+current_mine_wood+' needed:'+to_complete_wood);
+                        });
+
+                        this.back();
+
+                        this.thenClick('#mainview > #islandfeatures > #tradegood > a');
+                        this.then(function() {
+                            // this.capture('island3.png');
+                            this.echo('on the island tradegood');
+
+                            max_mine_tradegood = this.fetchText('#resUpgrade div[class="content"] > ul[class="resources"] li[class="wood"]').replace(/[^\d]/g, '');
+                            current_mine_tradegood = this.fetchText('#resUpgrade div[class="content"] > div > ul[class="resources"] li[class="wood"]').replace(/[^\d]/g, '');
+                            to_complete_tradegood = max_mine_tradegood-current_mine_tradegood;
+                            this.echo('tradegood mine: max:'+max_mine_tradegood+' current:'+current_mine_tradegood+' needed:'+to_complete_tradegood);
+                        });
+
+                        this.back();
+
+                        this.then(function() {
+                            if (to_complete_tradegood <= to_complete_wood)
+                            {
+                                this.echo('trade mine chosen for donation');
+                                to_clic = '#mainview > #islandfeatures > #tradegood > a';
+                            }
+                            else
+                            {
+                                this.echo('wood mine chosen for donation');
+                                to_clic = '#mainview > #islandfeatures > #resource > a';
+                            }
+                            this.thenClick(to_clic);
 
                             this.then(function() {
-                                this.echo(name+" has donate: "+must_donate+' !');
+                                // this.capture('island4.png');
+
+                                if (this.exists('#donateWood'))
+                                {
+                                    this.fill('form:not(.ambrosiaDonateForm)', {
+                                        'donation': must_donate
+                                    }, true);
+
+                                    this.then(function() {
+                                        this.echo(name+" has donate: "+must_donate+' !');
+                                    });
+                                }
+                                else
+                                {
+                                    this.echo('mine already upgrading !');
+                                }
                             });
                         });
                     });

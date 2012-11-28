@@ -212,21 +212,21 @@ casper.todo_tranport = function(item, names, index) {
 
         this.thenOpen('http://m16.fr.ikariam.com/index.php?view=island&id='+bk_city_info.island_id).then(function() {
 
-            this.then(function() {
-                this.capture('bookmark_island_1.png');
-            });
+            // this.then(function() {
+            //     this.capture('bookmark_island_1.png');
+            // });
 
             this.thenClick('#'+bk_city_info.town_id);
 
-            this.then(function() {
-                this.capture('bookmark_island_2.png');
-            });
+            // this.then(function() {
+            //     this.capture('bookmark_island_2.png');
+            // });
 
             this.thenClick('#actions li[class="transport "] a');
 
-            this.then(function() {
-                this.capture('bookmark_island_3.png');
-            });
+            // this.then(function() {
+            //     this.capture('bookmark_island_3.png');
+            // });
 
         });
 
@@ -316,6 +316,7 @@ casper.todo_tranport = function(item, names, index) {
                 // this.capture('port3.png');
                 this.echo(this.fetchText('#arrival'));
 
+                todo_json['transport'][index]['arrival'] = this.fetchText('#arrival');
                 // on submit !
                 this.thenClick('#submit');
             });
@@ -443,6 +444,7 @@ casper.todo_tranport = function(item, names, index) {
                         this.then(function() {
                             // this.capture('port3.png');
                             this.echo(this.fetchText('#arrival'));
+                            todo_json['transport'][index]['arrival'] = this.fetchText('#arrival');
 
                             // on submit !
                             this.thenClick('#submit');
