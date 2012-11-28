@@ -171,6 +171,7 @@ casper.action_decision = function action_decision() {
 
     this.then(function() {
 
+        // FOR EACH CITY
         this.each(names, function(casper, name, i) {
             this.then(function() {
                 this.echo('analyzing resources for: '+ name);
