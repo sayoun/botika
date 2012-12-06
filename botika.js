@@ -17,6 +17,7 @@ var account_info = {};
 var bookmark_file = 'bookmark.json';
 var bookmark_info = {};
 var force_town_key = false;
+var assign_max_workers = true;
 
 phantom.injectJs('includes/cli.js');
 phantom.injectJs('includes/report.js');

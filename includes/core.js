@@ -176,8 +176,14 @@ casper.action_decision = function action_decision() {
             this.then(function() {
                 this.echo('analyzing resources for: '+ name);
                 local_data = mega_data['data']['resources'][name];
+                assign_donation = false;
 
                 if (local_data['wood']['full'] > 90)
+                {
+                    assign_donation = true;
+                }
+
+                if (assign_max_workers || assign_donation)
                 {
                     var timeur = Math.floor((Math.random()*3000)+1);
                     this.echo('timeur = '+ timeur);
@@ -193,22 +199,25 @@ casper.action_decision = function action_decision() {
                     this.thenClick('#changeCityForm li[class="viewCity"] > a');
 
                     this.then(function() {
-                        current_wood = local_data['wood']['value'];
-                        this.echo('alert too much wood: '+local_data['wood']['full']+'%, must donate !');
-                        // dump(local_data['wood']);
-
-                        should_donate = local_data['worked']['wood']*8;
-                        this.echo(name+' produce '+local_data['worked']['wood']+ ' per hour, should donate: '+ should_donate);
-
-                        if (should_donate <= current_wood)
+                        if (assign_donation)
                         {
-                            must_donate = should_donate
-                        }
-                        else {
-                            must_donate = current_wood
-                        }
+                            current_wood = local_data['wood']['value'];
+                            this.echo('alert too much wood: '+local_data['wood']['full']+'%, must donate !');
+                            // dump(local_data['wood']);
 
-                        this.echo("let's donate: "+must_donate+' !');
+                            should_donate = local_data['worked']['wood']*8;
+                            this.echo(name+' produce '+local_data['worked']['wood']+ ' per hour, should donate: '+ should_donate);
+
+                            if (should_donate <= current_wood)
+                            {
+                                must_donate = should_donate
+                            }
+                            else {
+                                must_donate = current_wood
+                            }
+
+                            this.echo("let's donate: "+must_donate+' !');
+                        }
                     });
 
                     this.thenClick('#changeCityForm li[class="viewIsland"] > a');
@@ -221,63 +230,144 @@ casper.action_decision = function action_decision() {
                         this.thenClick('#mainview > #islandfeatures > #resource > a');
                         this.then(function() {
                             // this.capture('island2.png');
-                            this.echo('on the island wood');
+                            this.echo('on the island: wood');
 
                             max_mine_wood = this.fetchText('#resUpgrade div[class="content"] > ul[class="resources"] li[class="wood"]').replace(/[^\d]/g, '');
                             current_mine_wood = this.fetchText('#resUpgrade div[class="content"] > div > ul[class="resources"] li[class="wood"]').replace(/[^\d]/g, '');
                             to_complete_wood = max_mine_wood-current_mine_wood;
                             this.echo('wood mine: max:'+max_mine_wood+' current:'+current_mine_wood+' needed:'+to_complete_wood);
-                        });
 
-                        this.back();
+                            this.then(function() {
+
+                                // ASSIGN MAX WORKERS TO EACH RESOURCE
+                                if (assign_max_workers)
+                                {
+                                    if (this.exists('#workersWrapper a[class="setMax"]'))
+                                    {
+                                        this.then(function() {
+                                            slider_config = this.evaluate(function() {
+                                                tab = {};
+                                                $('#resource > script').each(function()
+                                                {
+                                                    matched = $(this).html().match(/overcharge : \d+/g);
+                                                    if ( matched != null) {
+                                                        tab.overcharge = parseInt(matched[0].replace(/[^\d]/g, ''));
+                                                        tab.maxvalue = parseInt($(this).html().match(/maxValue : \d+/g)[0].replace(/[^\d]/g, ''));
+                                                        tab.inivalue = parseInt($(this).html().match(/iniValue : \d+/g)[0].replace(/[^\d]/g, ''));
+                                                    }
+                                                });
+                                                return tab;
+                                            });
+                                            this.echo('workers:'+slider_config['inivalue']+' max:'+slider_config['maxvalue']);
+                                        });
+
+                                        this.then(function() {
+                                            this.fill('form#setWorkers', {
+                                                'rw': slider_config['maxvalue']
+                                            }, true);
+
+                                            this.then(function() {
+                                                this.echo(name+" has assigned max workers: "+slider_config['maxvalue']+' !');
+                                            });
+                                        });
+                                    }
+                                }
+                            });
+                        });
+                        this.thenClick('#changeCityForm li[class="viewIsland"] > a');
 
                         this.thenClick('#mainview > #islandfeatures > #tradegood > a');
                         this.then(function() {
                             // this.capture('island3.png');
-                            this.echo('on the island tradegood');
+                            this.echo('on the island: tradegood');
 
                             max_mine_tradegood = this.fetchText('#resUpgrade div[class="content"] > ul[class="resources"] li[class="wood"]').replace(/[^\d]/g, '');
                             current_mine_tradegood = this.fetchText('#resUpgrade div[class="content"] > div > ul[class="resources"] li[class="wood"]').replace(/[^\d]/g, '');
                             to_complete_tradegood = max_mine_tradegood-current_mine_tradegood;
                             this.echo('tradegood mine: max:'+max_mine_tradegood+' current:'+current_mine_tradegood+' needed:'+to_complete_tradegood);
-                        });
-
-                        this.back();
-
-                        this.then(function() {
-                            if (to_complete_tradegood <= to_complete_wood)
-                            {
-                                this.echo('trade mine chosen for donation');
-                                to_clic = '#mainview > #islandfeatures > #tradegood > a';
-                            }
-                            else
-                            {
-                                this.echo('wood mine chosen for donation');
-                                to_clic = '#mainview > #islandfeatures > #resource > a';
-                            }
-                            this.thenClick(to_clic);
 
                             this.then(function() {
-                                // this.capture('island4.png');
 
-                                if (this.exists('#donateWood'))
+                                // ASSIGN MAX WORKERS TO EACH RESOURCE
+                                if (assign_max_workers)
                                 {
-                                    this.fill('form:not(.ambrosiaDonateForm)', {
-                                        'donation': must_donate
-                                    }, true);
+                                    if (this.exists('#workersWrapper a[class="setMax"]'))
+                                    {
+                                        this.then(function() {
+                                            slider_config = this.evaluate(function() {
+                                                tab = {};
+                                                $('#tradegood > script').each(function()
+                                                {
+                                                    matched = $(this).html().match(/overcharge : \d+/g);
+                                                    if ( matched != null) {
+                                                        tab.overcharge = parseInt(matched[0].replace(/[^\d]/g, ''));
+                                                        tab.maxvalue = parseInt($(this).html().match(/maxValue : \d+/g)[0].replace(/[^\d]/g, ''));
+                                                        tab.inivalue = parseInt($(this).html().match(/iniValue : \d+/g)[0].replace(/[^\d]/g, ''));
+                                                    }
+                                                });
+                                                return tab;
+                                            });
+                                            this.echo('workers:'+slider_config['inivalue']+' max:'+slider_config['maxvalue']);
+                                        });
 
-                                    this.then(function() {
-                                        this.echo(name+" has donate: "+must_donate+' !');
-                                    });
-                                }
-                                else
-                                {
-                                    this.echo('mine already upgrading !');
+                                        this.then(function() {
+                                            this.fill('form#setWorkers', {
+                                                'tw': slider_config['maxvalue']
+                                            }, true);
+
+                                            this.then(function() {
+                                                this.echo(name+" has assigned max workers: "+slider_config['maxvalue']+' !');
+                                            });
+                                        });
+                                    }
                                 }
                             });
                         });
+
+                        // this.then(function() {
+                        //     this.exit();
+                        // });
+
+                        if (assign_donation)
+                        {
+                            this.thenClick('#changeCityForm li[class="viewIsland"] > a');
+
+                            this.then(function() {
+                                if (to_complete_tradegood <= to_complete_wood)
+                                {
+                                    this.echo('trade mine chosen for donation');
+                                    to_clic = '#mainview > #islandfeatures > #tradegood > a';
+                                }
+                                else
+                                {
+                                    this.echo('wood mine chosen for donation');
+                                    to_clic = '#mainview > #islandfeatures > #resource > a';
+                                }
+                                this.thenClick(to_clic);
+
+                                this.then(function() {
+                                    // this.capture('island4.png');
+
+                                    if (this.exists('#donateWood'))
+                                    {
+                                        this.fill('form:not(.ambrosiaDonateForm)', {
+                                            'donation': must_donate
+                                        }, true);
+
+                                        this.then(function() {
+                                            this.echo(name+" has donate: "+must_donate+' !');
+                                        });
+                                    }
+                                    else
+                                    {
+                                        this.echo('mine already upgrading !');
+                                    }
+                                });
+                            });
+                        };
                     });
                 }
+
             });
         });
     });
