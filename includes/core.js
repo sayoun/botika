@@ -372,3 +372,63 @@ casper.action_decision = function action_decision() {
         });
     });
 };
+
+casper.action_tasks = function action_tasks() {
+    daily_json = JSON.parse(fs.read(daily_file));
+    todo_json = JSON.parse(fs.read(todo_file));
+    // dump(todo_json);
+
+    var n = new Date();
+    n.setHours(0,0,0,0);
+    today_timestamp = Math.floor(n.getTime() / 1000);
+    casper.echo("today_timestamp:" + today_timestamp);
+
+    // casper.get_data(true);
+    // TODO : ajouter le code du get ressource global (sans le vin et les advisors)
+    // factoriser la fonction au dessus qui recup les resources pour moduler suivants les params optionnels
+
+    this.then(function() {
+        if (daily_json['tasks'])
+        {
+            this.echo('tasks found !');
+
+            this.each(daily_json['tasks'], function(self, item, i) {
+                this.then(function() {
+
+                    if (parseInt(item['timestamp']) == today_timestamp)
+                    {
+                        this.echo('TASK ALREADY DONE FOR TODAY');
+                    }
+                    else
+                    {
+                        casper.echo("daily_json_timestamp:" + item['timestamp']);
+                        // GET GLOBAL RESOURCE INFO
+                        var data = this.evaluate(getGlobalInfo);
+                        // dump(data);
+                        mega_data['global'] = data;
+
+                        if (item['name'] == 'balance')
+                        {
+                            this.echo('TASK BALANCE FOUND');
+                            this.action_balance(item, names, i, todo_json);
+
+                            daily_json['tasks'][i]['timestamp'] = today_timestamp;
+                        }
+
+                    }
+                });
+            });
+        }
+    });
+
+    this.then(function() {
+        // dump(daily_json);
+        // on sauve le daily.json
+        fs.write(daily_file, utils.serialize(daily_json, 4), 'w');
+    });
+
+    this.then(function() {
+        // on sauve le todo.json
+        fs.write(todo_file, utils.serialize(todo_json, 4), 'w');
+    });
+};

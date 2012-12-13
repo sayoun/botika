@@ -28,6 +28,7 @@ casper.cli_check();
 
 var filename_to_dump = 'report.json';
 var todo_file = 'todo.json';
+var daily_file = 'daily.json';
 var mega_data = {};
 
 casper.start('http://fr.ikariam.com', function() {
@@ -80,6 +81,7 @@ casper.then(function() {
     if ((action_key == 'report') || (action_key == 'todo'))
     {
         casper.action_decision();
+        casper.action_tasks();
     }
 
 });

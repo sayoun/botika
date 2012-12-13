@@ -476,3 +476,96 @@ casper.todo_tranport = function(item, names, index) {
     }
     return [];
 };
+
+casper.add_transport = function(source, target, tradegood, number) {
+
+    if (! todo_json['transport'])
+    {
+        todo_json['transport'] = [];
+    };
+
+    var entry = {};
+    var cargo = [];
+
+    var cargo_item = {};
+    cargo_item.number = number;
+    cargo_item.resource = tradegood;
+
+    cargo.push(cargo_item);
+
+    entry.cargo = cargo;
+    entry.cargo['number'] = number;
+    entry.cargo['resource'] = tradegood;
+    entry.destination = target;
+    entry.source = source;
+    // dump(entry);
+
+    todo_json['transport'].push(entry);
+
+    mega_data['data']['resources'][target][tradegood]['value'] += number;
+
+    mega_data['data']['resources'][target][tradegood]['full'] = Math.round(
+        mega_data['data']['resources'][target][tradegood]['value'] / mega_data['data']['resources'][target]['max_capacity'] * 100);
+};
+
+casper.get_city_low_tradegood_stock = function(names, tradegood) {
+
+    var chosen_city = names[0];
+    var chosen_value = 100;
+    this.echo('chosen start: '+chosen_city);
+
+    this.each(names, function(casper, name, i) {
+        if (mega_data['data']['resources'][name][tradegood]['full'] < chosen_value)
+        {
+            chosen_value = mega_data['data']['resources'][name][tradegood]['full'];
+            chosen_city = name;
+        }
+    });
+
+    this.echo('lowest city: '+chosen_city+' with:'+chosen_value);
+    return chosen_city;
+};
+
+casper.action_balance = function(item, names, index, todo_json) {
+
+    // dump(mega_data['data']['resources']);
+
+    var tradeGoods  = [
+                    'marble',
+                    'glass',
+                    'sulfur',
+                    'wine'
+                    ];
+
+    this.each(names, function(casper, name, i) {
+        for(var i=0;i<tradeGoods.length;i++)
+        {
+            tradegood = tradeGoods[i];
+
+            // only if we have workers for this tradegood
+            if (mega_data['data']['resources'][name]['worked'][tradegood] > 0)
+            {
+                full = mega_data['data']['resources'][name][tradegood]['full'];
+
+                // if (full > 95)
+                if (full > 24)
+                {
+                    this.echo(name+' is FULL:'+full+' for: '+tradegood+' need balance!');
+                    target = this.get_city_low_tradegood_stock(names, tradegood);
+
+                    // we move 10%
+                    number = Math.floor(mega_data['data']['resources'][name][tradegood]['value'] * 0.10);
+                    this.echo('sending: '+number+' '+tradegood+' from:'+name+' to: '+target);
+
+                    this.add_transport(name, target, tradegood, number);
+                }
+            }
+        }
+    });
+
+    // dump(todo_json);
+
+    // this.then(function() {
+    //     this.exit();
+    // });
+};
