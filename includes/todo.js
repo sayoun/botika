@@ -547,8 +547,7 @@ casper.action_balance = function(item, names, index, todo_json) {
             {
                 full = mega_data['data']['resources'][name][tradegood]['full'];
 
-                // if (full > 95)
-                if (full > 24)
+                if (full > 95)
                 {
                     this.echo(name+' is FULL:'+full+' for: '+tradegood+' need balance!');
                     target = this.get_city_low_tradegood_stock(names, tradegood);
