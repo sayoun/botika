@@ -262,13 +262,16 @@ casper.action_decision = function action_decision() {
                                         });
 
                                         this.then(function() {
-                                            this.fill('form#setWorkers', {
-                                                'rw': slider_config['maxvalue']
-                                            }, true);
+                                            if (slider_config['inivalue'] != slider_config['maxvalue'])
+                                            {
+                                                this.fill('form#setWorkers', {
+                                                    'rw': slider_config['maxvalue']
+                                                }, true);
 
-                                            this.then(function() {
-                                                this.echo(name+" has assigned max workers: "+slider_config['maxvalue']+' !');
-                                            });
+                                                this.then(function() {
+                                                    this.echo(name+" has assigned max workers: "+slider_config['maxvalue']+' !');
+                                                });
+                                            }
                                         });
                                     }
                                 }
@@ -311,13 +314,16 @@ casper.action_decision = function action_decision() {
                                         });
 
                                         this.then(function() {
-                                            this.fill('form#setWorkers', {
-                                                'tw': slider_config['maxvalue']
-                                            }, true);
+                                            if (slider_config['inivalue'] != slider_config['maxvalue'])
+                                            {
+                                                this.fill('form#setWorkers', {
+                                                    'tw': slider_config['maxvalue']
+                                                }, true);
 
-                                            this.then(function() {
-                                                this.echo(name+" has assigned max workers: "+slider_config['maxvalue']+' !');
-                                            });
+                                                this.then(function() {
+                                                    this.echo(name+" has assigned max workers: "+slider_config['maxvalue']+' !');
+                                                });
+                                            }
                                         });
                                     }
                                 }
