@@ -120,6 +120,21 @@ var processBuild = function(name, cargo, index) {
     else
     {
         this.output('building NOT found '+cargo.building);
+        // not found, maybe we can create it ?
+        if (this.exists('#mainview > #locations > li[class="buildingGround land"] > a'))
+        {
+            this.output('free space for building found !');
+
+            this.thenClick('#mainview > #locations > li[class="buildingGround land"] > a');
+
+            this.then(function() {
+                if (this.exists('#buildings > li[class="building '+cargo.building+'"] > a'))
+                {
+                    this.output('building '+cargo.building+'available in choices)';
+                    this.thenClick('#buildings > li[class="building '+cargo.building+'"] a[class="button build"]');
+                }
+            });
+        }
     }
 
     // on revient sur la vue de la ville
