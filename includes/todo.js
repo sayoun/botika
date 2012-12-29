@@ -130,7 +130,7 @@ var processBuild = function(name, cargo, index) {
             this.then(function() {
                 if (this.exists('#buildings > li[class="building '+cargo.building+'"] > a'))
                 {
-                    this.output('building '+cargo.building+'available in choices)';
+                    this.output('building '+cargo.building+'available in choices');
                     this.thenClick('#buildings > li[class="building '+cargo.building+'"] a[class="button build"]');
                 }
             });
