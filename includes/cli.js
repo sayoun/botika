@@ -6,7 +6,7 @@ casper.cli_check = function cli_check() {
 
     if (casper.cli.args.length === 0 && Object.keys(casper.cli.options).length === 0) {
         casper
-            .echo("You must provide some args.")
+            .output("You must provide some args.")
             .exit(1)
         ;
     }
@@ -21,7 +21,7 @@ casper.cli_check = function cli_check() {
     else
     {
         casper
-            .echo("Login is mandatory")
+            .output("Login is mandatory")
             .exit(1)
         ;
     }
@@ -33,7 +33,7 @@ casper.cli_check = function cli_check() {
     else
     {
         casper
-            .echo("Action is mandatory")
+            .output("Action is mandatory")
             .exit(1)
         ;
     }

@@ -12,6 +12,7 @@ var dump = require("utils").dump;
 var utils = require("utils");
 var fs = require('fs');
 var x = require('casper').selectXPath;
+var format = require('utils').format;
 var account_file = 'account.json';
 var account_info = {};
 var bookmark_file = 'bookmark.json';
@@ -56,7 +57,7 @@ casper.then(function() {
 
     if (force_town_key)
     {
-        this.echo('FORCING TOWN REQUESTED:'+force_town_key);
+        this.output('FORCING TOWN REQUESTED:'+force_town_key);
         // ON FORCE LA VILLE A CHECKER
         names.push(force_town_key);
     }
@@ -80,14 +81,14 @@ casper.then(function() {
 
     if ((action_key == 'report') || (action_key == 'todo'))
     {
-        casper.action_decision();
+        casper.action_decision(false);
         casper.action_tasks();
     }
 
 });
 
 casper.run(function() {
-    this.echo('running done.');
+    this.output('running done.');
 
     // TODO : sauver aussi le todo.json qui aura mis a jour avec ce qu'il a fait
     // dump(mega_data);

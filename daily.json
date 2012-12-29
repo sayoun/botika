@@ -2,7 +2,11 @@
     "tasks": [
         {
             "name": "balance",
-            "timestamp": 1355353200
+            "timestamp": 1356735600
+        },
+        {
+            "name": "donation",
+            "timestamp": 1356735600
         }
     ]
 }

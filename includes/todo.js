@@ -24,18 +24,18 @@ function checkResourceForBuilding() {
 
 var processBuild = function(name, cargo, index) {
 
-    this.echo('Process build for: '+name);
+    this.output('Process build for: '+name);
     // this.capture('test-'+name+'.png');
     dump(cargo);
 
     if (this.exists('#mainview > #locations > li[class="'+cargo.building+'"] > a'))
     {
-        this.echo('building found ! '+cargo.building);
+        this.output('building found ! '+cargo.building);
 
         this.thenClick('#mainview > #locations > li[class="'+cargo.building+'"] > a');
 
         this.then(function() {
-            this.echo('sur la vue du batiment normalement :) '+cargo.building);
+            this.output('sur la vue du batiment normalement :) '+cargo.building);
             // this.capture('building_'+cargo.building+'.png');
 
             if (this.exists('#buildingUpgrade'))
@@ -43,11 +43,11 @@ var processBuild = function(name, cargo, index) {
 
                 if (this.exists('#upgradeInProgress'))
                 {
-                    this.echo('BUILDING ALREADY USED !');
+                    this.output('BUILDING ALREADY USED !');
                 }
                 else
                 {
-                    this.echo('on peut upgrader ici !');
+                    this.output('on peut upgrader ici !');
 
                     // on recup le prix du batiment
                     var checks = this.evaluate(checkResourceForBuilding);
@@ -57,7 +57,7 @@ var processBuild = function(name, cargo, index) {
                     if (checks.level < cargo.level)
                     {
                         // le level du batiment est plus petit que ce qu'on veut build donc OK
-                        this.echo('building level OK');
+                        this.output('building level OK');
 
                         var ok = true;
                         // on va checker qu'on a assez de chaque resource
@@ -66,11 +66,11 @@ var processBuild = function(name, cargo, index) {
                             resource_actual = mega_data['data']['resources'][name][resource.name]['value'];
                             if ( resource.value <= mega_data['data']['resources'][name][resource.name]['value'] )
                             {
-                                this.echo('OK for: '+resource.name+' actual:'+resource_actual+' needed:'+resource.value);
+                                this.output('OK for: '+resource.name+' actual:'+resource_actual+' needed:'+resource.value);
                             }
                             else
                             {
-                                this.echo('NOK for: '+resource.name+ ' actual:'+resource_actual+' needed:'+resource.value+' diff:'+(resource.value-resource_actual));
+                                this.output('NOK for: '+resource.name+ ' actual:'+resource_actual+' needed:'+resource.value+' diff:'+(resource.value-resource_actual));
                                 ok = false;
                             }
                         });
@@ -79,7 +79,7 @@ var processBuild = function(name, cargo, index) {
                         {
                             // on lance la construction
                             this.thenClick('#buildingUpgrade li[class="upgrade"] > a');
-                            this.echo('BUILD LAUNCHED ! '+cargo.building);
+                            this.output('BUILD LAUNCHED ! '+cargo.building);
 
                             // TODO : check qu'on a bien upgrade jusqu'au level demande
                             // si oui on update le todojson en mémoire
@@ -88,22 +88,22 @@ var processBuild = function(name, cargo, index) {
                             if ((checks.level+1) == cargo.level)
                             {
                                 todo_json['build'][index]['done'] = true;
-                                this.echo('TODO BUILD index to update for item '+name +': '+ index);
+                                this.output('TODO BUILD index to update for item '+name +': '+ index);
                             }
                             else
                             {
-                                this.echo('THERE IS STILL BUILDING TO MAKE for '+name)
+                                this.output('THERE IS STILL BUILDING TO MAKE for '+name)
                             }
                         }
                         else
                         {
                             // on skip la construction
-                            this.echo('BUILD CANCELED ! '+cargo.building);
+                            this.output('BUILD CANCELED ! '+cargo.building);
                         }
                     }
                     else
                     {
-                        this.echo('building level NOK, actual:'+checks.level+' needed:'+cargo.level);
+                        this.output('building level NOK, actual:'+checks.level+' needed:'+cargo.level);
                         if (checks.level >= cargo.level)
                         {
                             todo_json['build'][index]['done'] = true;
@@ -113,13 +113,13 @@ var processBuild = function(name, cargo, index) {
             }
             else
             {
-                this.echo('level max !');
+                this.output('level max !');
             }
         });
     }
     else
     {
-        this.echo('building NOT found '+cargo.building);
+        this.output('building NOT found '+cargo.building);
     }
 
     // on revient sur la vue de la ville
@@ -127,15 +127,15 @@ var processBuild = function(name, cargo, index) {
 
     // this.then(function() {
     //     this.wait(3000);
-    //     this.echo('** post viewcity click **');
+    //     this.output('** post viewcity click **');
     //     this.capture('where_are_we.png');
     // });
 }
 
 casper.todo_build = function(item, names, index) {
 
-    // this.echo(item.source);
-    // this.echo(item.cargo);
+    // this.output(item.source);
+    // this.output(item.cargo);
     // dump(item);
 
     this.then(function() {
@@ -143,13 +143,13 @@ casper.todo_build = function(item, names, index) {
         {
             if (mega_data['data']['construction'][item.source].length > 0)
             {
-                this.echo('SKIPPING BUILDING ALREADY RUNNING FOR :'+item.source);
+                this.output('SKIPPING BUILDING ALREADY RUNNING FOR :'+item.source);
                 return false;
             }
             else
             {
                 var timeur = Math.floor((Math.random()*3000)+1);
-                this.echo('timeur = '+ timeur);
+                this.output('timeur = '+ timeur);
                 this.wait(timeur);
 
                 this.thenClick(x("//form[@id='changeCityForm']//ul[@class='optionList']//li[text()='"+item.source+"']"));
@@ -186,12 +186,12 @@ casper.todo_build = function(item, names, index) {
 casper.todo_tranport = function(item, names, index) {
 
     var timeur = Math.floor((Math.random()*3000)+1);
-    this.echo('timeur = '+ timeur);
+    this.output('timeur = '+ timeur);
     this.wait(timeur);
 
     this.thenClick(x("//form[@id='changeCityForm']//ul[@class='optionList']//li[text()='"+item.source+"']"));
 
-    // this.echo(names.indexOf(item.source));
+    // this.output(names.indexOf(item.source));
 
     this.evaluate(function(term) {
             document.querySelector('#citySelect').selectedIndex = term;
@@ -202,13 +202,13 @@ casper.todo_tranport = function(item, names, index) {
 
     if (item.bookmark)
     {
-        this.echo('BOOKMARK needed for: '+item.destination);
+        this.output('BOOKMARK needed for: '+item.destination);
 
         info = item.destination.split('/');
         bk_index = info[0];
         bk_city_name = info[1];
         bk_city_info = bookmark_info[bk_index][bk_city_name];
-        this.echo('BOOKMARK island_id: '+bk_city_info.island_id+' town_id: '+bk_city_info.town_id);
+        this.output('BOOKMARK island_id: '+bk_city_info.island_id+' town_id: '+bk_city_info.town_id);
 
         this.thenOpen('http://m16.fr.ikariam.com/index.php?view=island&id='+bk_city_info.island_id).then(function() {
 
@@ -272,7 +272,7 @@ casper.todo_tranport = function(item, names, index) {
 
                     if (!this.exists('#mainview > form input[name="'+field_name+'"]'))
                     {
-                        this.echo(item.source+' has no resource '+cargo.resource);
+                        this.output(item.source+' has no resource '+cargo.resource);
                         return;
                     }
 
@@ -282,7 +282,7 @@ casper.todo_tranport = function(item, names, index) {
                     // some space left to load cargo in full ?
                     if ((total_cargo_to_send + cargo.number) <= cargo_max_capacity)
                     {
-                        this.echo('ok to load cargo, enough ships availables: '+mega_data['global']['ships_available']);
+                        this.output('ok to load cargo, enough ships availables: '+mega_data['global']['ships_available']);
 
                         total_cargo_to_send += cargo.number;
                         entry[field_name] = cargo.number;
@@ -292,7 +292,7 @@ casper.todo_tranport = function(item, names, index) {
                     else if ( (cargo_space_left > 0) && (cargo_space_left <= cargo.number) )
                     {
                         // can we load at least some part of the cargo
-                        this.echo('loading partial cargo: '+cargo_space_left+' < '+cargo.number);
+                        this.output('loading partial cargo: '+cargo_space_left+' < '+cargo.number);
 
                         total_cargo_to_send += cargo_space_left;
                         entry[field_name] = cargo_space_left;
@@ -314,7 +314,7 @@ casper.todo_tranport = function(item, names, index) {
 
             this.then(function() {
                 // this.capture('port3.png');
-                this.echo(this.fetchText('#arrival'));
+                this.output(this.fetchText('#arrival'));
 
                 todo_json['transport'][index]['arrival'] = this.fetchText('#arrival');
                 // on submit !
@@ -328,14 +328,14 @@ casper.todo_tranport = function(item, names, index) {
                 if (this.exists('#mainview ul[class="error"]'))
                 {
                     // transport failed
-                    this.echo('Transport FAILED :'+this.fetchText('#mainview ul[class="error"]'));
+                    this.output('Transport FAILED :'+this.fetchText('#mainview ul[class="error"]'));
                 }
                 else
                 {
                     // update the todo.json only if not skipped data
                     if (!skipping && !partial_load)
                     {
-                        this.echo('TODO TRANSPORT index to update for item '+item.source +': '+ index);
+                        this.output('TODO TRANSPORT index to update for item '+item.source +': '+ index);
                         todo_json['transport'][index]['done'] = true;
                     }
                 }
@@ -401,7 +401,7 @@ casper.todo_tranport = function(item, names, index) {
 
                                 if (!this.exists('#mainview > form input[name="'+field_name+'"]'))
                                 {
-                                    this.echo(item.source+' has no resource '+cargo.resource);
+                                    this.output(item.source+' has no resource '+cargo.resource);
                                     return;
                                 }
 
@@ -411,7 +411,7 @@ casper.todo_tranport = function(item, names, index) {
                                 // some space left to load cargo in full ?
                                 if ((total_cargo_to_send + cargo.number) <= cargo_max_capacity)
                                 {
-                                    this.echo('ok to load cargo, enough ships availables: '+mega_data['global']['ships_available']);
+                                    this.output('ok to load cargo, enough ships availables: '+mega_data['global']['ships_available']);
 
                                     total_cargo_to_send += cargo.number;
                                     entry[field_name] = cargo.number;
@@ -421,7 +421,7 @@ casper.todo_tranport = function(item, names, index) {
                                 else if ( (cargo_space_left > 0) && (cargo_space_left <= cargo.number) )
                                 {
                                     // can we load at least some part of the cargo
-                                    this.echo('loading partial cargo: '+cargo_space_left+' < '+cargo.number);
+                                    this.output('loading partial cargo: '+cargo_space_left+' < '+cargo.number);
 
                                     total_cargo_to_send += cargo_space_left;
                                     entry[field_name] = cargo_space_left;
@@ -443,7 +443,7 @@ casper.todo_tranport = function(item, names, index) {
 
                         this.then(function() {
                             // this.capture('port3.png');
-                            this.echo(this.fetchText('#arrival'));
+                            this.output(this.fetchText('#arrival'));
                             todo_json['transport'][index]['arrival'] = this.fetchText('#arrival');
 
                             // on submit !
@@ -457,14 +457,14 @@ casper.todo_tranport = function(item, names, index) {
                             if (this.exists('#mainview ul[class="error"]'))
                             {
                                 // transport failed
-                                this.echo('Transport FAILED :'+this.fetchText('#mainview ul[class="error"]'));
+                                this.output('Transport FAILED :'+this.fetchText('#mainview ul[class="error"]'));
                             }
                             else
                             {
                                 // update the todo.json only if not skipped data
                                 if (!skipping && !partial_load)
                                 {
-                                    this.echo('TODO TRANSPORT index to update for item '+item.source +': '+ index);
+                                    this.output('TODO TRANSPORT index to update for item '+item.source +': '+ index);
                                     todo_json['transport'][index]['done'] = true;
                                 }
                             }
@@ -512,7 +512,7 @@ casper.get_city_low_tradegood_stock = function(names, tradegood) {
 
     var chosen_city = names[0];
     var chosen_value = 100;
-    this.echo('chosen start: '+chosen_city);
+    this.output('chosen start: '+chosen_city);
 
     this.each(names, function(casper, name, i) {
         if (mega_data['data']['resources'][name][tradegood]['full'] < chosen_value)
@@ -522,7 +522,7 @@ casper.get_city_low_tradegood_stock = function(names, tradegood) {
         }
     });
 
-    this.echo('lowest city: '+chosen_city+' with:'+chosen_value);
+    this.output('lowest city: '+chosen_city+' with:'+chosen_value);
     return chosen_city;
 };
 
@@ -549,12 +549,12 @@ casper.action_balance = function(item, names, index, todo_json) {
 
                 if (full > 95)
                 {
-                    this.echo(name+' is FULL:'+full+' for: '+tradegood+' need balance!');
+                    this.output(name+' is FULL:'+full+' for: '+tradegood+' need balance!');
                     target = this.get_city_low_tradegood_stock(names, tradegood);
 
                     // we move 10%
                     number = Math.floor(mega_data['data']['resources'][name][tradegood]['value'] * 0.10);
-                    this.echo('sending: '+number+' '+tradegood+' from:'+name+' to: '+target);
+                    this.output('sending: '+number+' '+tradegood+' from:'+name+' to: '+target);
 
                     this.add_transport(name, target, tradegood, number);
                 }

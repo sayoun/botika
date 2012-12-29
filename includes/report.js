@@ -287,7 +287,7 @@ function parsePage() {
 
 var processPage = function(name, wine) {
 
-    this.echo('Process page for: '+name);
+    this.output('Process page for: '+name);
     // this.capture('test-'+name+'.png');
 
     if (wine)

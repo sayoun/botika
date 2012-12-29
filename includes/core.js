@@ -66,13 +66,13 @@ casper.action_todo = function action_todo() {
     this.then(function() {
         if (todo_json['transport'])
         {
-            this.echo('transport found !');
+            this.output('transport found !');
 
             this.each(todo_json['transport'], function(self, item, i) {
                 this.then(function() {
                     if (item['done'] == true)
                     {
-                        this.echo('TODO TRANSPORT ALREADY DONE');
+                        this.output('TODO TRANSPORT ALREADY DONE');
                     }
                     else
                     {
@@ -84,7 +84,7 @@ casper.action_todo = function action_todo() {
                         if (mega_data['global']['ships_available'] == 0)
                         {
                             // no ship at all
-                            this.echo('NOT ENOUGH SHIPS TO SEND, ABORT !');
+                            this.output('NOT ENOUGH SHIPS TO SEND, ABORT !');
                         }
                         else
                         {
@@ -96,13 +96,13 @@ casper.action_todo = function action_todo() {
         }
         if (todo_json['build'])
         {
-            this.echo('build found !');
+            this.output('build found !');
 
             this.each(todo_json['build'], function(self, item, i) {
                 this.then(function() {
                     if (item['done'] == true)
                     {
-                        this.echo('TODO BUILD ALREADY DONE');
+                        this.output('TODO BUILD ALREADY DONE');
                     }
                     else
                     {
@@ -136,11 +136,11 @@ casper.get_data = function get_data(wine) {
 
         // FOR EACH CITY
         this.each(names, function(casper, name, i) {
-            this.echo('Fecthing data for ' + name + ' - ' + i);
+            this.output('Fecthing data for ' + name + ' - ' + i);
 
             // this.wait(1000);
             var timeur = Math.floor((Math.random()*3000)+1);
-            this.echo('timeur = '+ timeur);
+            this.output('timeur = '+ timeur);
             this.wait(timeur);
 
             this.thenClick(x("//form[@id='changeCityForm']//ul[@class='optionList']//li[text()='"+name+"']"));
@@ -164,7 +164,7 @@ casper.get_data = function get_data(wine) {
     });
 };
 
-casper.action_decision = function action_decision() {
+casper.action_decision = function action_decision(force_donation) {
 
     // TODO : ajouter le code du get ressource global (sans le vin et les advisors)
     // factoriser la fonction au dessus qui recup les resources pour moduler suivants les params optionnels
@@ -174,7 +174,7 @@ casper.action_decision = function action_decision() {
         // FOR EACH CITY
         this.each(names, function(casper, name, i) {
             this.then(function() {
-                this.echo('analyzing resources for: '+ name);
+                this.output('analyzing resources for: '+ name);
                 local_data = mega_data['data']['resources'][name];
                 assign_donation = false;
 
@@ -183,10 +183,15 @@ casper.action_decision = function action_decision() {
                     assign_donation = true;
                 }
 
+                if (force_donation)
+                {
+                    assign_donation = true;
+                }
+
                 if (assign_max_workers || assign_donation)
                 {
                     var timeur = Math.floor((Math.random()*3000)+1);
-                    this.echo('timeur = '+ timeur);
+                    this.output('timeur = '+ timeur);
                     this.wait(timeur);
 
                     this.thenClick(x("//form[@id='changeCityForm']//ul[@class='optionList']//li[text()='"+name+"']"));
@@ -202,11 +207,11 @@ casper.action_decision = function action_decision() {
                         if (assign_donation)
                         {
                             current_wood = local_data['wood']['value'];
-                            this.echo('alert too much wood: '+local_data['wood']['full']+'%, must donate !');
+                            this.output('alert too much wood: '+local_data['wood']['full']+'%, must donate !');
                             // dump(local_data['wood']);
 
                             should_donate = local_data['worked']['wood']*8;
-                            this.echo(name+' produce '+local_data['worked']['wood']+ ' per hour, should donate: '+ should_donate);
+                            this.output(name+' produce '+local_data['worked']['wood']+ ' per hour, should donate: '+ should_donate);
 
                             if (should_donate <= current_wood)
                             {
@@ -216,7 +221,7 @@ casper.action_decision = function action_decision() {
                                 must_donate = current_wood
                             }
 
-                            this.echo("let's donate: "+must_donate+' !');
+                            this.output("let's donate: "+must_donate+' !');
                         }
                     });
 
@@ -230,12 +235,12 @@ casper.action_decision = function action_decision() {
                         this.thenClick('#mainview > #islandfeatures > #resource > a');
                         this.then(function() {
                             // this.capture('island2.png');
-                            this.echo('on the island: wood');
+                            this.output('on the island: wood');
 
                             max_mine_wood = this.fetchText('#resUpgrade div[class="content"] > ul[class="resources"] li[class="wood"]').replace(/[^\d]/g, '');
                             current_mine_wood = this.fetchText('#resUpgrade div[class="content"] > div > ul[class="resources"] li[class="wood"]').replace(/[^\d]/g, '');
                             to_complete_wood = max_mine_wood-current_mine_wood;
-                            this.echo('wood mine: max:'+max_mine_wood+' current:'+current_mine_wood+' needed:'+to_complete_wood);
+                            this.output('wood mine: max:'+max_mine_wood+' current:'+current_mine_wood+' needed:'+to_complete_wood);
 
                             this.then(function() {
 
@@ -258,7 +263,7 @@ casper.action_decision = function action_decision() {
                                                 });
                                                 return tab;
                                             });
-                                            this.echo('workers:'+slider_config['inivalue']+' max:'+slider_config['maxvalue']);
+                                            this.output('workers:'+slider_config['inivalue']+' max:'+slider_config['maxvalue']);
                                         });
 
                                         this.then(function() {
@@ -269,7 +274,7 @@ casper.action_decision = function action_decision() {
                                                 }, true);
 
                                                 this.then(function() {
-                                                    this.echo(name+" has assigned max workers: "+slider_config['maxvalue']+' !');
+                                                    this.output(name+" has assigned max workers: "+slider_config['maxvalue']+' !');
                                                 });
                                             }
                                         });
@@ -282,12 +287,12 @@ casper.action_decision = function action_decision() {
                         this.thenClick('#mainview > #islandfeatures > #tradegood > a');
                         this.then(function() {
                             // this.capture('island3.png');
-                            this.echo('on the island: tradegood');
+                            this.output('on the island: tradegood');
 
                             max_mine_tradegood = this.fetchText('#resUpgrade div[class="content"] > ul[class="resources"] li[class="wood"]').replace(/[^\d]/g, '');
                             current_mine_tradegood = this.fetchText('#resUpgrade div[class="content"] > div > ul[class="resources"] li[class="wood"]').replace(/[^\d]/g, '');
                             to_complete_tradegood = max_mine_tradegood-current_mine_tradegood;
-                            this.echo('tradegood mine: max:'+max_mine_tradegood+' current:'+current_mine_tradegood+' needed:'+to_complete_tradegood);
+                            this.output('tradegood mine: max:'+max_mine_tradegood+' current:'+current_mine_tradegood+' needed:'+to_complete_tradegood);
 
                             this.then(function() {
 
@@ -310,7 +315,7 @@ casper.action_decision = function action_decision() {
                                                 });
                                                 return tab;
                                             });
-                                            this.echo('workers:'+slider_config['inivalue']+' max:'+slider_config['maxvalue']);
+                                            this.output('workers:'+slider_config['inivalue']+' max:'+slider_config['maxvalue']);
                                         });
 
                                         this.then(function() {
@@ -321,7 +326,7 @@ casper.action_decision = function action_decision() {
                                                 }, true);
 
                                                 this.then(function() {
-                                                    this.echo(name+" has assigned max workers: "+slider_config['maxvalue']+' !');
+                                                    this.output(name+" has assigned max workers: "+slider_config['maxvalue']+' !');
                                                 });
                                             }
                                         });
@@ -341,12 +346,12 @@ casper.action_decision = function action_decision() {
                             this.then(function() {
                                 if (to_complete_tradegood <= to_complete_wood)
                                 {
-                                    this.echo('trade mine chosen for donation');
+                                    this.output('trade mine chosen for donation');
                                     to_clic = '#mainview > #islandfeatures > #tradegood > a';
                                 }
                                 else
                                 {
-                                    this.echo('wood mine chosen for donation');
+                                    this.output('wood mine chosen for donation');
                                     to_clic = '#mainview > #islandfeatures > #resource > a';
                                 }
                                 this.thenClick(to_clic);
@@ -361,12 +366,12 @@ casper.action_decision = function action_decision() {
                                         }, true);
 
                                         this.then(function() {
-                                            this.echo(name+" has donate: "+must_donate+' !');
+                                            this.output(name+" has donate: "+must_donate+' !');
                                         });
                                     }
                                     else
                                     {
-                                        this.echo('mine already upgrading !');
+                                        this.output('mine already upgrading !');
                                     }
                                 });
                             });
@@ -386,8 +391,8 @@ casper.action_tasks = function action_tasks() {
 
     var n = new Date();
     n.setHours(0,0,0,0);
-    today_timestamp = Math.floor(n.getTime() / 1000);
-    casper.echo("today_timestamp:" + today_timestamp);
+    var today_timestamp = Math.floor(n.getTime() / 1000);
+    casper.output("today_timestamp:" + today_timestamp);
 
     // casper.get_data(true);
     // TODO : ajouter le code du get ressource global (sans le vin et les advisors)
@@ -396,18 +401,18 @@ casper.action_tasks = function action_tasks() {
     this.then(function() {
         if (daily_json['tasks'])
         {
-            this.echo('tasks found !');
+            this.output('tasks found !');
 
             this.each(daily_json['tasks'], function(self, item, i) {
                 this.then(function() {
 
                     if (parseInt(item['timestamp']) == today_timestamp)
                     {
-                        this.echo('TASK ALREADY DONE FOR TODAY');
+                        this.output('TASK ALREADY DONE FOR TODAY');
                     }
                     else
                     {
-                        casper.echo("daily_json_timestamp:" + item['timestamp']);
+                        casper.output("daily_json_timestamp:" + item['timestamp']);
                         // GET GLOBAL RESOURCE INFO
                         var data = this.evaluate(getGlobalInfo);
                         // dump(data);
@@ -415,12 +420,19 @@ casper.action_tasks = function action_tasks() {
 
                         if (item['name'] == 'balance')
                         {
-                            this.echo('TASK BALANCE FOUND');
+                            this.output('TASK BALANCE FOUND');
                             this.action_balance(item, names, i, todo_json);
 
                             daily_json['tasks'][i]['timestamp'] = today_timestamp;
                         }
 
+                        if (item['name'] == 'donation')
+                        {
+                            this.output('TASK DONATION FOUND');
+                            casper.action_decision(true);
+
+                            daily_json['tasks'][i]['timestamp'] = today_timestamp;
+                        }
                     }
                 });
             });
@@ -437,4 +449,28 @@ casper.action_tasks = function action_tasks() {
         // on sauve le todo.json
         fs.write(todo_file, utils.serialize(todo_json, 4), 'w');
     });
+};
+
+casper.output = function output(text) {
+    var currentDate = new Date()
+    var day = currentDate.getDate()
+    var month = currentDate.getMonth() + 1
+    var year = currentDate.getFullYear()
+    var hours = currentDate.getHours()
+    var minutes = currentDate.getMinutes()
+    var seconds = currentDate.getSeconds()
+
+    if (minutes < 10)
+    {
+        minutes = "0" + minutes;
+    }
+
+    if (seconds < 10)
+    {
+        seconds = "0" + seconds;
+    }
+
+    var timestamp = format('[%s/%s/%s %s:%s:%s] ', day, month, year, hours, minutes, seconds);
+    casper.echo(timestamp+text);
+    return casper;
 };
