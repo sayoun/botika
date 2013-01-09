@@ -151,6 +151,49 @@ var processBuild = function(name, cargo, index) {
     // });
 }
 
+casper.todo_action = function(item, names, index) {
+
+    var timeur = Math.floor((Math.random()*3000)+1);
+    this.output('timeur = '+ timeur);
+    this.wait(timeur);
+
+    this.thenClick(x("//form[@id='changeCityForm']//ul[@class='optionList']//li[text()='"+item.source+"']"));
+
+    this.evaluate(function(term) {
+            document.querySelector('#citySelect').selectedIndex = term;
+            document.querySelector('#citySelect').onchange();
+        }, { term: names.indexOf(item.source) });
+
+    this.thenClick('#changeCityForm li[class="viewCity"] > a');
+
+    if (item.action == 'max_tavern')
+    {
+        // SET MAX WINE CONSUME
+        if (this.exists('#mainview > #locations > li[class="tavern"] > a'))
+        {
+            this.thenClick('#mainview > #locations > li[class="tavern"] > a');
+            this.then(function() {
+                // assign max wine
+                this.output('assigning max wine');
+                this.thenClick('#units a[class="setMax"]');
+
+                // submit
+                this.then(function() {
+                    this.fill('form#wineAssignForm', {}, true);
+                    this.output('ACTION: assigned max wine to '+item.source);
+                });
+                // back to town view
+                this.thenClick('#changeCityForm li[class="viewCity"] > a');
+            });
+
+            this.then(function() {
+                todo_json['action'][index]['done'] = true;
+            });
+        }
+    }
+
+};
+
 casper.todo_build = function(item, names, index) {
 
     // this.output(item.source);
@@ -201,6 +244,197 @@ casper.todo_build = function(item, names, index) {
 
     return [];
 }
+
+casper.send_transport = function(source, destination, resource, number, index) {
+
+    var timeur = Math.floor((Math.random()*3000)+1);
+    this.output('timeur = '+ timeur);
+    this.wait(timeur);
+
+    this.thenClick(x("//form[@id='changeCityForm']//ul[@class='optionList']//li[text()='"+source+"']"));
+
+    this.evaluate(function(term) {
+            document.querySelector('#citySelect').selectedIndex = term;
+            document.querySelector('#citySelect').onchange();
+        }, { term: names.indexOf(source) });
+
+    this.thenClick('#changeCityForm li[class="viewCity"] > a');
+
+    this.then(function() {
+
+        if (this.exists('#mainview > #locations > li[class="port"] > a'))
+        {
+            this.thenClick('#mainview > #locations > li[class="port"] > a');
+            this.then(function() {
+                // this.capture('port1.png');
+
+                // AUTO ACCEPT SHIP BUYOUT
+                if (this.exists('div[class="forminput"] > a'))
+                {
+                    this.thenClick('div[class="forminput"] > a');
+                };
+
+                // CLICK ON THE TOWN ICON
+                this.thenClick('#mainview > div[class="contentBox01h"] li[title="'+destination+'"] > a');
+                this.then(function() {
+                    // this.capture('port2.png');
+
+                    var entry = {};
+
+                    // cargo_resource   = wood
+                    // cargo_tradegood1 = wine
+                    // cargo_tradegood2 = marble
+                    // cargo_tradegood3 = glass
+                    // cargo_tradegood4 = sulfur
+
+                    var field_name = '';
+                    if (resource == 'wood')
+                    {
+                        field_name = 'cargo_resource';
+                    }
+                    if (resource == 'wine')
+                    {
+                        field_name = 'cargo_tradegood1';
+                    }
+                    if (resource == 'marble')
+                    {
+                        field_name = 'cargo_tradegood2';
+                    }
+                    if (resource == 'glass')
+                    {
+                        field_name = 'cargo_tradegood3';
+                    }
+                    if (resource == 'sulfur')
+                    {
+                        field_name = 'cargo_tradegood4';
+                    }
+
+                    entry[field_name] = number;
+
+                    // fill the form
+                    this.fill('#mainview > form', entry, false);
+
+                    this.then(function() {
+                        // this.capture('port3.png');
+                        this.output('estimated arrival: '+this.fetchText('#arrival'));
+
+                        // on submit !
+                        this.thenClick('#submit');
+                    });
+
+                    this.then(function() {
+                        // post submit
+                        // this.capture('port4.png');
+
+                        if (this.exists('#mainview ul[class="error"]'))
+                        {
+                            // transport failed
+                            this.output('Transport FAILED :'+this.fetchText('#mainview ul[class="error"]'));
+                        }
+                        else
+                        {
+                            this.output('Transport STARTED for:'+source+'->'+destination+' '+number+' '+resource);
+
+                            if (todo_json['transport'][index]['cargo'][0]['number'] > number)
+                            {
+                                todo_json['transport'][index]['cargo'][0]['number'] -= number;
+                            }
+                            else
+                            {
+                                todo_json['transport'][index]['cargo'][0]['number'] = 0;
+                                todo_json['transport'][index]['done'] = true;
+                            }
+                        }
+                    });
+                });
+            });
+        }
+    });
+};
+
+casper.todo_tranport_split = function(item, names, index) {
+
+    if (item.split) {
+        this.then(function() {
+            split_resource = item['cargo'][0].resource;
+            split_number = item['cargo'][0].number;
+            this.output('WE MUST SPLIT THIS CARGO:'+split_number+' '+split_resource);
+
+            var tab_eligible_towns = [];
+            // FOR EACH CITY
+            this.each(names, function(casper, name, i) {
+                this.then(function() {
+                    // this.output('checking resources for: '+ name);
+                    local_data = mega_data['data']['resources'][name];
+
+                    if (local_data[split_resource]['value'] > 0)
+                    {
+                        this.output(name+': '+local_data[split_resource]['value']+' '+split_resource);
+                        tab_eligible_towns.push(name);
+                    }
+                });
+            });
+            this.then(function() {
+                cargo_max_capacity = mega_data['global']['ships_available'] * 500;
+                this.output('WE HAVE '+mega_data['global']['ships_available']+' ('+cargo_max_capacity+') SHIPS AVAILABLE!');
+
+                needed_ships = split_number / 500;
+
+                if (needed_ships <= mega_data['global']['ships_available'])
+                {
+                    // need to send less than we can
+                    need_to_send_ships = needed_ships;
+                }
+                else
+                {
+                    // need to send more than we can
+                    need_to_send_ships = mega_data['global']['ships_available'];
+                }
+
+                this.output('WE NEED TO USE '+need_to_send_ships+' SHIPS');
+                // if (split_number <= cargo_max_capacity)
+                // {
+                //     // need to send less than we can
+                //     need_to_send = split_number;
+                // }
+                // else
+                // {
+                //     // need to send more than we can
+                //     need_to_send = cargo_max_capacity;
+                // }
+
+                // cargo_part_average = Math.floor(need_to_send / tab_eligible_towns.length);
+                // this.output('average cargo part per town:'+cargo_part_average);
+
+                ships_per_town = Math.round(need_to_send_ships / tab_eligible_towns.length);
+                this.output('average ships per town:'+ships_per_town+'('+(ships_per_town*500)+')');
+                cargo_part_average = ships_per_town*500;
+
+                cargo_iteration_to_send = cargo_part_average * tab_eligible_towns.length;
+
+                this.then(function() {
+                    this.each(tab_eligible_towns, function(casper, town, i) {
+
+                        if (i == (tab_eligible_towns.length-1))
+                        {
+                            cargo_part_average += ((need_to_send_ships*500) - cargo_iteration_to_send);
+                        }
+
+                        if (mega_data['data']['resources'][town][split_resource]['value'] >= cargo_part_average)
+                        {
+                            this.output('sending:'+cargo_part_average+' '+split_resource+' from:'+town+' to:'+item.destination);
+                            this.send_transport(town, item.destination, split_resource, cargo_part_average, index);
+                        }
+                        else
+                        {
+                            this.output('not enough '+split_resource+' in '+town+':'+mega_data['data']['resources'][town][split_resource]['value']);
+                        }
+                    });
+                });
+            });
+        });
+    };
+};
 
 casper.todo_tranport = function(item, names, index) {
 

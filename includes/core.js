@@ -2,19 +2,58 @@ casper.action_report = function action_report() {
     // #advCities
     this.thenClick('#advCities a:first-child');
     this.then(function() {
-        // this.capture('new_location1.png');
+        // this.capture('news_location1.png');
         var news = this.evaluate(getCitiesInfo);
         // dump(news);
         // mega_data.news = news;
 
         this.thenClick('#inboxCity div[class="next"] a:first-child');
         this.then(function() {
-            // this.capture('new_location1.png');
+            // this.capture('news_location2.png');
             var news2 = this.evaluate(getCitiesInfo);
             // dump(news2);
-            // news.push.apply(news, news2)
             mega_data.news = news.concat(news2);
         });
+
+        // this.thenClick('#inboxCity div[class="next"] a:first-child');
+        // this.then(function() {
+        //     // this.capture('news_location3.png');
+        //     var news3 = this.evaluate(getCitiesInfo);
+        //     // dump(news3);
+        //     mega_data.news = mega_data.news.concat(news3);
+        // });
+
+        // this.thenClick('#inboxCity div[class="next"] a:first-child');
+        // this.then(function() {
+        //     // this.capture('news_location4.png');
+        //     var news4 = this.evaluate(getCitiesInfo);
+        //     // dump(news4);
+        //     mega_data.news = mega_data.news.concat(news4);
+        // });
+
+        // this.thenClick('#inboxCity div[class="next"] a:first-child');
+        // this.then(function() {
+        //     // this.capture('news_location5.png');
+        //     var news5 = this.evaluate(getCitiesInfo);
+        //     // dump(news5);
+        //     mega_data.news = mega_data.news.concat(news5);
+        // });
+
+        // this.thenClick('#inboxCity div[class="next"] a:first-child');
+        // this.then(function() {
+        //     // this.capture('news_location6.png');
+        //     var news6 = this.evaluate(getCitiesInfo);
+        //     // dump(news6);
+        //     mega_data.news = mega_data.news.concat(news6);
+        // });
+
+        // this.thenClick('#inboxCity div[class="next"] a:first-child');
+        // this.then(function() {
+        //     // this.capture('news_location7.png');
+        //     var news7 = this.evaluate(getCitiesInfo);
+        //     // dump(news7);
+        //     mega_data.news = mega_data.news.concat(news7);
+        // });
     });
     // #advResearch
     this.thenClick('#advResearch a:first-child');
@@ -88,7 +127,13 @@ casper.action_todo = function action_todo() {
                         }
                         else
                         {
-                            this.todo_tranport(item, names, i);
+                            if (item.split)
+                            {
+                                this.todo_tranport_split(item, names, i);
+                            }
+                            else {
+                                this.todo_tranport(item, names, i);
+                            }
                         }
                     }
                 });
@@ -107,6 +152,23 @@ casper.action_todo = function action_todo() {
                     else
                     {
                         this.todo_build(item, names, i);
+                    }
+                });
+            });
+        }
+        if (todo_json['action'])
+        {
+            this.output('action found !');
+
+            this.each(todo_json['action'], function(self, item, i) {
+                this.then(function() {
+                    if (item['done'] == true)
+                    {
+                        this.output('TODO ACTION ALREADY DONE');
+                    }
+                    else
+                    {
+                        this.todo_action(item, names, i);
                     }
                 });
             });

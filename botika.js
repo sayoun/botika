@@ -77,14 +77,9 @@ casper.then(function() {
     {
         casper.action_todo();
         casper.action_report();
-    }
-
-    if ((action_key == 'report') || (action_key == 'todo'))
-    {
         casper.action_decision(false);
         casper.action_tasks();
     }
-
 });
 
 casper.run(function() {
