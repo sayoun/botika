@@ -245,7 +245,7 @@ casper.todo_build = function(item, names, index) {
     return [];
 }
 
-casper.send_transport = function(source, destination, resource, number, index) {
+casper.send_transport = function(source, destination, resource, number, index, bookmark) {
 
     var timeur = Math.floor((Math.random()*3000)+1);
     this.output('timeur = '+ timeur);
@@ -262,93 +262,109 @@ casper.send_transport = function(source, destination, resource, number, index) {
 
     this.then(function() {
 
-        if (this.exists('#mainview > #locations > li[class="port"] > a'))
+        if (bookmark)
         {
-            this.thenClick('#mainview > #locations > li[class="port"] > a');
-            this.then(function() {
-                // this.capture('port1.png');
+            this.output('BOOKMARK needed for: '+destination);
 
-                // AUTO ACCEPT SHIP BUYOUT
-                if (this.exists('div[class="forminput"] > a'))
-                {
-                    this.thenClick('div[class="forminput"] > a');
-                };
+            info = destination.split('/');
+            bk_index = info[0];
+            bk_city_name = info[1];
+            bk_city_info = bookmark_info[bk_index][bk_city_name];
+            this.output('BOOKMARK island_id: '+bk_city_info.island_id+' town_id: '+bk_city_info.town_id);
 
-                // CLICK ON THE TOWN ICON
-                this.thenClick('#mainview > div[class="contentBox01h"] li[title="'+destination+'"] > a');
-                this.then(function() {
-                    // this.capture('port2.png');
-
-                    var entry = {};
-
-                    // cargo_resource   = wood
-                    // cargo_tradegood1 = wine
-                    // cargo_tradegood2 = marble
-                    // cargo_tradegood3 = glass
-                    // cargo_tradegood4 = sulfur
-
-                    var field_name = '';
-                    if (resource == 'wood')
-                    {
-                        field_name = 'cargo_resource';
-                    }
-                    if (resource == 'wine')
-                    {
-                        field_name = 'cargo_tradegood1';
-                    }
-                    if (resource == 'marble')
-                    {
-                        field_name = 'cargo_tradegood2';
-                    }
-                    if (resource == 'glass')
-                    {
-                        field_name = 'cargo_tradegood3';
-                    }
-                    if (resource == 'sulfur')
-                    {
-                        field_name = 'cargo_tradegood4';
-                    }
-
-                    entry[field_name] = number;
-
-                    // fill the form
-                    this.fill('#mainview > form', entry, false);
-
-                    this.then(function() {
-                        // this.capture('port3.png');
-                        this.output('estimated arrival: '+this.fetchText('#arrival'));
-
-                        // on submit !
-                        this.thenClick('#submit');
-                    });
-
-                    this.then(function() {
-                        // post submit
-                        // this.capture('port4.png');
-
-                        if (this.exists('#mainview ul[class="error"]'))
-                        {
-                            // transport failed
-                            this.output('Transport FAILED :'+this.fetchText('#mainview ul[class="error"]'));
-                        }
-                        else
-                        {
-                            this.output('Transport STARTED for:'+source+'->'+destination+' '+number+' '+resource);
-
-                            if (todo_json['transport'][index]['cargo'][0]['number'] > number)
-                            {
-                                todo_json['transport'][index]['cargo'][0]['number'] -= number;
-                            }
-                            else
-                            {
-                                todo_json['transport'][index]['cargo'][0]['number'] = 0;
-                                todo_json['transport'][index]['done'] = true;
-                            }
-                        }
-                    });
-                });
+            this.thenOpen('http://m16.fr.ikariam.com/index.php?view=island&id='+bk_city_info.island_id).then(function() {
+                this.thenClick('#'+bk_city_info.town_id);
+                this.thenClick('#actions li[class="transport "] a');
             });
         }
+        else
+        {
+            if (this.exists('#mainview > #locations > li[class="port"] > a'))
+            {
+                this.thenClick('#mainview > #locations > li[class="port"] > a');
+                // CLICK ON THE TOWN ICON
+                this.thenClick('#mainview > div[class="contentBox01h"] li[title="'+destination+'"] > a');
+            }
+        }
+
+        this.then(function() {
+            // this.capture('port1.png');
+
+            // AUTO ACCEPT SHIP BUYOUT
+            if (this.exists('div[class="forminput"] > a'))
+            {
+                this.thenClick('div[class="forminput"] > a');
+            };
+
+            // this.capture('port2.png');
+            var entry = {};
+
+            // cargo_resource   = wood
+            // cargo_tradegood1 = wine
+            // cargo_tradegood2 = marble
+            // cargo_tradegood3 = glass
+            // cargo_tradegood4 = sulfur
+
+            var field_name = '';
+            if (resource == 'wood')
+            {
+                field_name = 'cargo_resource';
+            }
+            if (resource == 'wine')
+            {
+                field_name = 'cargo_tradegood1';
+            }
+            if (resource == 'marble')
+            {
+                field_name = 'cargo_tradegood2';
+            }
+            if (resource == 'glass')
+            {
+                field_name = 'cargo_tradegood3';
+            }
+            if (resource == 'sulfur')
+            {
+                field_name = 'cargo_tradegood4';
+            }
+
+            entry[field_name] = number;
+
+            // fill the form
+            this.fill('#mainview > form', entry, false);
+
+            this.then(function() {
+                // this.capture('port3.png');
+                this.output('estimated arrival: '+this.fetchText('#arrival'));
+
+                // on submit !
+                this.thenClick('#submit');
+            });
+
+            this.then(function() {
+                // post submit
+                // this.capture('port4.png');
+
+                if (this.exists('#mainview ul[class="error"]'))
+                {
+                    // transport failed
+                    this.output('Transport FAILED :'+this.fetchText('#mainview ul[class="error"]'));
+                }
+                else
+                {
+                    this.output('Transport STARTED for:'+source+'->'+destination+' '+number+' '+resource);
+
+                    if (todo_json['transport'][index]['cargo'][0]['number'] > number)
+                    {
+                        todo_json['transport'][index]['cargo'][0]['number'] -= number;
+                    }
+                    else
+                    {
+                        todo_json['transport'][index]['cargo'][0]['number'] = 0;
+                        todo_json['transport'][index]['done'] = true;
+                    }
+                }
+            });
+        });
     });
 };
 
@@ -423,7 +439,7 @@ casper.todo_tranport_split = function(item, names, index) {
                         if (mega_data['data']['resources'][town][split_resource]['value'] >= cargo_part_average)
                         {
                             this.output('sending:'+cargo_part_average+' '+split_resource+' from:'+town+' to:'+item.destination);
-                            this.send_transport(town, item.destination, split_resource, cargo_part_average, index);
+                            this.send_transport(town, item.destination, split_resource, cargo_part_average, index, item.bookmark);
                         }
                         else
                         {
