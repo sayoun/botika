@@ -166,7 +166,7 @@ function getResourceInfo() {
     resources['sulfur'].value      = parseInt($('#value_sulfur').text().replace(/[^\d]/g, ''));
 
     var selector = $('#cityResources li[class="wood"]');
-    var capacity_max = parseInt($('div' ,selector).text().match(/((\d|,|\.)+k?).*$/i)[1].replace(/[^\d]/g, ''));
+    var capacity_max = parseInt($('div' ,selector).text().match(/((\d|,|\.)+k?).*$/i)[1].replace(/[^\dk]/g, '').replace(/k/g, '000'));
 
     resources.max_capacity = capacity_max;
 
