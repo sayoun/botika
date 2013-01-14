@@ -305,19 +305,19 @@ class Parser():
                                                 )
             )
 
-        # header = "%-10s \t%-10s \t%10s \t%10s \t%10s \t%10s" % ('City', 'carpentering', 'architect', 'fireworker', 'vineyard', 'optician')
-        # dict_print('-' * 110)
-        # dict_print(header)
-        # dict_print('-' * 110)
+        header = "%-10s \t%-10s \t%10s \t%10s \t%10s \t%10s" % ('City', 'carpentering', 'architect', 'fireworker', 'vineyard', 'optician')
+        dict_print('-' * 110)
+        dict_print(header)
+        dict_print('-' * 110)
 
-        # for city in data:
-        #     dict_print("%-10s \t%10s \t%10s \t%10s \t%10s \t%10s" % (city,
-        #                                         building_list['carpentering'].get(city, '-'),
-        #                                         building_list['architect'].get(city, '-'),
-        #                                         building_list['fireworker'].get(city, '-'),
-        #                                         building_list['vineyard'].get(city, '-'),
-        #                                         building_list['optician'].get(city, '-'))
-        #     )
+        for city in data:
+            dict_print("%-10s \t%10s \t%10s \t%10s \t%10s \t%10s" % (city,
+                                                building_list['carpentering'].get(city, '-'),
+                                                building_list['architect'].get(city, '-'),
+                                                building_list['fireworker'].get(city, '-'),
+                                                building_list['vineyard'].get(city, '-'),
+                                                building_list['optician'].get(city, '-'))
+            )
 
         return 0
 
