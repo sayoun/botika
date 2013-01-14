@@ -148,12 +148,12 @@ class Parser():
             for res in ENUM_RESOURCES:
 
                 if data[city][res]['full'] > 95:
-                    extra = '<- ** WARNING **'
+                    extra = ' *'
                     self.to_mail = True
 
                 self.get_resource_output(res, data[city], output_resource_line)
 
-            dict_print("%-10s %s %s" % (city, ''.join(output_resource_line), extra))
+            dict_print("%-10s %s" % (city + extra, ''.join(output_resource_line)))
 
             total_wood += data[city]['wood']['value']
             total_marble += data[city]['marble']['value']
@@ -189,13 +189,13 @@ class Parser():
                 extra = ''
                 if 'empty' in data[item]:
                     if data[item].get('empty', 0) < 5:
-                        extra = '<- ** WARNING **'
+                        extra = ' *'
                         self.to_mail = True
 
                 total_wine_current += data[item].get('wine_current', 0)
                 total_wine_used += data[item].get('wine_used', 0)
 
-                dict_print("%-10s \t%12s \t%12s \t%12s %s" % (item,
+                dict_print("%-10s \t%12s \t%12s \t%12s %s" % (item + extra,
                                                     data[item].get('wine_current', 0),
                                                     data[item].get('wine_used', '--'),
                                                     data[item].get('empty', '--'),
