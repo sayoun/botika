@@ -104,7 +104,8 @@ class Parser():
 
         for item in data:
             (prefix, cargo) = self.parse_military_cargo_item(item['cargo'])
-            dict_print("%-20s \t%-10s \t%-20s \t%-45s \t%-8s" % (item['origin'],
+            if re.match(r'Transport \((.*)\)', item['type']):
+                dict_print("%-20s \t%-10s \t%-20s \t%-45s \t%-8s" % (item['origin'],
                                 re.match(r'Transport \((.*)\)', item['type']).group(1),
                                 item['destination'],
                                 '%s%s' % (prefix, cargo),
