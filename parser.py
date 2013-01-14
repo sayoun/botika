@@ -195,11 +195,10 @@ class Parser():
                 total_wine_current += data[item].get('wine_current', 0)
                 total_wine_used += data[item].get('wine_used', 0)
 
-                dict_print("%-10s \t%12s \t%12s \t%12s %s" % (item + extra,
+                dict_print("%-10s \t%12s \t%12s \t%12s" % (item + extra,
                                                     data[item].get('wine_current', 0),
                                                     data[item].get('wine_used', '--'),
-                                                    data[item].get('empty', '--'),
-                                                    extra
+                                                    data[item].get('empty', '--')
                                                     ))
         dict_print('-' * 100)
         dict_print("%-10s \t%12s \t%12s \t%12s" % ('Total',
