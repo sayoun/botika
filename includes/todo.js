@@ -386,7 +386,12 @@ casper.todo_tranport_split = function(item, names, index) {
                     if (local_data[split_resource]['value'] > 0)
                     {
                         this.output(name+': '+local_data[split_resource]['value']+' '+split_resource);
-                        tab_eligible_towns.push(name);
+
+                        // do not try to send from self
+                        if (name != item.destination)
+                        {
+                           tab_eligible_towns.push(name);
+                        }
                     }
                 });
             });
