@@ -28,6 +28,7 @@ function getCitiesInfo() {
 function getMilitaryInfo() {
     // return [];
     var military = [];
+
     $('#fleetMovements table[class="locationEvents"] tr').each(function()
             {
                 if ($(this).hasClass('own'))
@@ -159,11 +160,11 @@ function getResourceInfo() {
         'glass' : {},
         'sulfur' : {}
     };
-    resources['wood'].value        = parseInt($('#value_wood').text().replace(/[^\d]/g, ''));
-    resources['wine'].value        = parseInt($('#value_wine').text().replace(/[^\d]/g, ''));
-    resources['marble'].value      = parseInt($('#value_marble').text().replace(/[^\d]/g, ''));
-    resources['glass'].value       = parseInt($('#value_crystal').text().replace(/[^\d]/g, ''));
-    resources['sulfur'].value      = parseInt($('#value_sulfur').text().replace(/[^\d]/g, ''));
+    resources['wood'].value        = parseInt($('#value_wood').text().replace(/[^\dk]/g, '').replace(/k/g, '000'));
+    resources['wine'].value        = parseInt($('#value_wine').text().replace(/[^\dk]/g, '').replace(/k/g, '000'));
+    resources['marble'].value      = parseInt($('#value_marble').text().replace(/[^\dk]/g, '').replace(/k/g, '000'));
+    resources['glass'].value       = parseInt($('#value_crystal').text().replace(/[^\dk]/g, '').replace(/k/g, '000'));
+    resources['sulfur'].value      = parseInt($('#value_sulfur').text().replace(/[^\dk]/g, '').replace(/k/g, '000'));
 
     var selector = $('#cityResources li[class="wood"]');
     var capacity_max = parseInt($('div' ,selector).text().match(/((\d|,|\.)+k?).*$/i)[1].replace(/[^\dk]/g, '').replace(/k/g, '000'));
@@ -205,6 +206,7 @@ function getGlobalInfo() {
     entry.ambrosia          = parseInt($('#accountAmbrosia').text());
 
     ships_str               = $('#accountTransporter').text();
+
     entry.ships_available   = parseInt(ships_str.match(/\d+/g)[0]);
     entry.total_ships       = parseInt(ships_str.match(/\d+/g)[1]);
 
@@ -232,7 +234,7 @@ function getWineUsedInfo() {
     var entry = {};
 
     entry.wine_used = parseInt($('#wineAmount option:selected').text().replace(/[^\d]/g, ''));
-    entry.wine_current = parseInt($('#value_wine').text().replace(/[^\d]/g, ''));
+    entry.wine_current = parseInt($('#value_wine').text().replace(/[^\dk]/g, '').replace(/k/g, '000'));
     if (entry.wine_used > 0)
     {
         entry.empty = Math.round(entry.wine_current / (entry.wine_used * 24));
