@@ -44,5 +44,47 @@
                 "island_id": "4865",
                 "town_id": "city_26649"
             }
-        }
+        },
+    "sayan": {
+            "Jack": {
+                "island_id": "4867",
+                "town_id": "city_9301"
+            },
+            "Link": {
+                "island_id": "4867",
+                "town_id": "city_14342"
+            },
+            "Baelor": {
+                "island_id": "4865",
+                "town_id": "city_18490"
+            },
+            "Mario": {
+                "island_id": "4867",
+                "town_id": "city_33101"
+            },
+            "Kratos": {
+                "island_id": "4867",
+                "town_id": "city_44844"
+            },
+            "Cain": {
+                "island_id": "4867",
+                "town_id": "city_58650"
+            },
+            "Bruce": {
+                "island_id": "4867",
+                "town_id": "city_65012"
+            },
+            "Tyrion": {
+                "island_id": "4867",
+                "town_id": "city_69806"
+            },
+            "Sonic": {
+                "island_id": "4867",
+                "town_id": "city_77008"
+            },
+            "Polis": {
+                "island_id": "4867",
+                "town_id": "city_83728"
+            }
+    }
 }
