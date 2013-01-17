@@ -390,7 +390,22 @@ casper.todo_tranport_split = function(item, names, index) {
                         // do not try to send from self
                         if (name != item.destination)
                         {
-                           tab_eligible_towns.push(name);
+                            if (item.exclude_sources)
+                            {
+                                if (item.exclude_sources.indexOf(name) != -1)
+                                {
+                                    this.output('TOWN '+name+' MUST BE EXCLUDED!');
+                                }
+                                else
+                                {
+                                    this.output('TOWN '+name+' MUST BE USED!');
+                                    tab_eligible_towns.push(name);
+                                }
+                            }
+                            else
+                            {
+                                tab_eligible_towns.push(name);
+                            }
                         }
                     }
                 });
