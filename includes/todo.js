@@ -192,6 +192,32 @@ casper.todo_action = function(item, names, index) {
         }
     }
 
+    if (item.action == 'max_academy')
+    {
+        // SET MAX WINE CONSUME
+        if (this.exists('#mainview > #locations > li[class="academy"] > a'))
+        {
+            this.thenClick('#mainview > #locations > li[class="academy"] > a');
+            this.then(function() {
+                // assign max wine
+                this.output('assigning max scientists');
+                this.thenClick('#setScientists a[class="setMax"]');
+
+                // submit
+                this.then(function() {
+                    this.fill('form#setScientists', {}, true);
+                    this.output('ACTION: assigned max scientists to '+item.source);
+                });
+                // back to town view
+                this.thenClick('#changeCityForm li[class="viewCity"] > a');
+            });
+
+            this.then(function() {
+                todo_json['action'][index]['done'] = true;
+            });
+        }
+    }
+
 };
 
 casper.todo_build = function(item, names, index) {
