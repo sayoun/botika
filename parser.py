@@ -355,9 +355,12 @@ class Parser():
         return self.to_mail
 
 
-from collections import OrderedDict
 fp = open('report.json')
-data = json.load(fp, object_pairs_hook=OrderedDict)
+try:
+    from collections import OrderedDict
+    data = json.load(fp, object_pairs_hook=OrderedDict)
+except:
+    data = json.load(fp)
 fp.close()
 
 p = Parser()
