@@ -55,6 +55,10 @@ casper.then(function() {
         this.thenClick('div[class="dailyActivityButton"] input[class~="okButton"]');
     }
 
+    if (this.exists('a[class="button notice"]')) {
+        this.thenClick('a[class="button notice"]');
+    }
+
     if (force_town_key)
     {
         this.output('FORCING TOWN REQUESTED:'+force_town_key);
