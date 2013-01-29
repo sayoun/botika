@@ -28,11 +28,24 @@ var processBuild = function(name, cargo, index) {
     // this.capture('test-'+name+'.png');
     dump(cargo);
 
-    if (this.exists('#mainview > #locations > li[class="'+cargo.building+'"] > a'))
+    selector = '#mainview > #locations > li[class="'+cargo.building+'"] > a';
+
+    if (cargo.building == 'port1')
+    {
+        this.output("need to upgrade port "+cargo.building+" but there are 2 ports :(");
+        selector = '#mainview > #locations li#position1[class="port"] > a';
+    }
+    else if (cargo.building == 'port2')
+    {
+        this.output("need to upgrade port "+cargo.building+" but there are 2 ports :(");
+        selector = '#mainview > #locations li#position2[class="port"] > a';
+    }
+
+    if (this.exists(selector))
     {
         this.output('building found ! '+cargo.building);
 
-        this.thenClick('#mainview > #locations > li[class="'+cargo.building+'"] > a');
+        this.thenClick(selector);
 
         this.then(function() {
             this.output('sur la vue du batiment normalement :) '+cargo.building);
