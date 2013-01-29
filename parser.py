@@ -7,6 +7,7 @@ import subprocess
 import json
 import re
 from time import time
+from datetime import datetime
 
 streamWriter = codecs.lookup('utf-8')[-1]
 sys.stdout = streamWriter(sys.stdout)
@@ -81,6 +82,7 @@ class Parser():
     def parse_military_cargo_item(self, cargo):
 
         tab = []
+        prefix = ''
 
         for cargo_item in cargo:
             if 'ship_transport' in cargo_item['type']:
@@ -104,9 +106,8 @@ class Parser():
 
         for item in data:
             (prefix, cargo) = self.parse_military_cargo_item(item['cargo'])
-            if re.match(r'Transport \((.*)\)', item['type']):
-                dict_print("%-20s \t%-10s \t%-20s \t%-45s \t%-8s" % (item['origin'],
-                                re.match(r'Transport \((.*)\)', item['type']).group(1),
+            dict_print("%-20s \t%-10s \t%-20s \t%-45s \t%-8s" % (item['origin'],
+                                item['type'],
                                 item['destination'],
                                 '%s%s' % (prefix, cargo),
                                 item['time_left']
@@ -398,7 +399,14 @@ if p:
     if p.get_to_mail():
         print "to mail !"
         # print p.get_content()
+        generated_time = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
+        html_header = '<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8" /><title>Botika report - ' + generated_time + '</title></head><body>'
+        html_footer = '</body></html>'
         f = open('body_to_mail', 'w')
+        f.write(html_header)
+        f.write('<pre style="font-size: 14px;">')
         f.write(p.get_content().encode('utf-8'))
+        f.write('</pre>')
+        f.write(html_footer)
         f.close()
         # print subprocess.call('mail -s "botika report" [user@server] < body_to_mail', shell=True)
