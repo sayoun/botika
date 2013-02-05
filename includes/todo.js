@@ -854,6 +854,19 @@ casper.get_city_low_tradegood_stock = function(names, tradegood) {
     return chosen_city;
 };
 
+
+casper.get_total_tradegood_stock = function(names, tradegood) {
+
+    total_tradegood = 0;
+
+    this.each(names, function(casper, name, i) {
+        total_tradegood += mega_data['data']['resources'][name][tradegood]['value'];
+    });
+
+    this.output('total tradegood stock for '+tradegood+': '+total_tradegood);
+    return total_tradegood;
+};
+
 casper.action_balance = function(item, names, index, todo_json) {
 
     // dump(mega_data['data']['resources']);
@@ -889,10 +902,44 @@ casper.action_balance = function(item, names, index, todo_json) {
             }
         }
     });
+};
 
-    // dump(todo_json);
+casper.action_equalize = function(item, names, index, todo_json) {
 
-    // this.then(function() {
-    //     this.exit();
+    // dump(mega_data['data']['resources']);
+
+    var tradeGoods  = [
+                    'wood',
+                    ];
+
+    // this.each(names, function(casper, name, i) {
+        for(var i=0;i<tradeGoods.length;i++)
+        {
+            tradegood = tradeGoods[i];
+            // only wood for now
+
+            total_tradegood = this.get_total_tradegood_stock(names, tradegood);
+
+            average_tradegood = Math.round(total_tradegood / names.length);
+            this.output('average tradegood per town:'+average_tradegood);
+
+            // // only if we have workers for this tradegood
+            // if (mega_data['data']['resources'][name]['worked'][tradegood] > 0)
+            // {
+            //     full = mega_data['data']['resources'][name][tradegood]['full'];
+
+            //     if (full > 95)
+            //     {
+            //         this.output(name+' is FULL:'+full+' for: '+tradegood+' need balance!');
+            //         target = this.get_city_low_tradegood_stock(names, tradegood);
+
+            //         // we move 10%
+            //         number = Math.floor(mega_data['data']['resources'][name][tradegood]['value'] * 0.10);
+            //         this.output('sending: '+number+' '+tradegood+' from:'+name+' to: '+target);
+
+            //         this.add_transport(name, target, tradegood, number);
+            //     }
+            // }
+        }
     // });
 };
