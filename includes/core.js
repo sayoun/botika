@@ -503,6 +503,14 @@ casper.action_tasks = function action_tasks() {
 
                             daily_json['tasks'][i]['timestamp'] = today_timestamp;
                         }
+
+                        if (item['name'] == 'equalize_full')
+                        {
+                            this.output('TASK EQUALIZE FULL FOUND');
+                            casper.action_equalize_full(item, names, i, todo_json);
+
+                            daily_json['tasks'][i]['timestamp'] = today_timestamp;
+                        }
                     }
                 });
             });
