@@ -1022,7 +1022,7 @@ casper.action_equalize_full = function(item, names, index, todo_json) {
                     town_plus[index_plus]['value'] -= number;
                     town_minus[index_minus]['value'] = 0;
                     trade_available = town_plus[index_plus]['value'];
-                    // this.add_transport(name, target, tradegood, number);
+                    this.add_transport(name, target, tradegood, number);
                 }
                 else
                 {   // plus city has not enough to fill this minus city
@@ -1034,7 +1034,7 @@ casper.action_equalize_full = function(item, names, index, todo_json) {
                     town_plus[index_plus]['value'] = 0;
                     town_minus[index_minus]['value'] -= number;
                     trade_available = 0;
-                    // this.add_transport(name, target, tradegood, number);
+                    this.add_transport(name, target, tradegood, number);
                 }
             }
         }
