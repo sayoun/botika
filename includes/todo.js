@@ -904,6 +904,143 @@ casper.action_balance = function(item, names, index, todo_json) {
     });
 };
 
+casper.action_equalize_full = function(item, names, index, todo_json) {
+
+    var tradeGoods  = [
+                    'wood',
+                    ];
+
+    for(var i=0;i<tradeGoods.length;i++)
+    {
+        tradegood = tradeGoods[i];
+        // only wood for now
+
+        total_full_in = 0;
+        tab_eligible_towns = [];
+        this.each(names, function(casper, name, i) {
+
+            if (item.exclude_sources)
+            {
+                if (item.exclude_sources.indexOf(name) != -1)
+                {
+                    this.output('TOWN '+name+' MUST BE EXCLUDED!');
+                    return true;
+                }
+                else
+                {
+                    this.output('TOWN '+name+' MUST BE USED!');
+                    tab_eligible_towns.push(name);
+                }
+            }
+            else
+            {
+                tab_eligible_towns.push(name);
+            };
+
+            this.output('for town: '+name);
+            if (mega_data['data']['resources'][name]['worked'][tradegood])
+            {
+                current_tradegood = mega_data['data']['resources'][name][tradegood]['value'];
+                town_max_capacity = mega_data['data']['resources'][name]['max_capacity'];
+                tradegood_per_hour = mega_data['data']['resources'][name]['worked'][tradegood];
+
+                full_in = Math.round( (town_max_capacity - current_tradegood) / tradegood_per_hour );
+
+                this.output("\t"+current_tradegood+'/'+town_max_capacity+' + '+tradegood_per_hour+' = '+full_in);
+
+                total_full_in += full_in;
+            }
+        });
+
+        // average needed per town
+        this.output('full in total: '+total_full_in);
+        average_full_in = Math.round(total_full_in / tab_eligible_towns.length);
+        this.output('average full_in expected per town:'+average_full_in);
+
+        town_plus = [];
+        town_minus = [];
+        this.each(tab_eligible_towns, function(casper, name, i) {
+            this.output('for town: '+name);
+            if (mega_data['data']['resources'][name]['worked'][tradegood])
+            {
+                current_tradegood = mega_data['data']['resources'][name][tradegood]['value'];
+                town_max_capacity = mega_data['data']['resources'][name]['max_capacity'];
+                tradegood_per_hour = mega_data['data']['resources'][name]['worked'][tradegood];
+
+                diff = (town_max_capacity - (average_full_in * tradegood_per_hour)) - current_tradegood;
+                if (diff > 0) {
+                    extra_output = '+';
+                }
+                else
+                {
+                    extra_output = '';
+                }
+                this.output('change to make for town '+name+ ': '+extra_output+diff);
+                var entry = {};
+                entry.name = name;
+                entry.value = Math.abs(diff);
+                if (diff < 0) {
+                    town_plus.push(entry);
+                }
+                else {
+                    town_minus.push(entry);
+                }
+            }
+        });
+
+        function compare(a,b) {
+            if (a.value < b.value)
+                return 1;
+            if (a.value > b.value)
+                return -1;
+            return 0;
+        };
+
+        town_plus.sort(compare);
+        town_minus.sort(compare);
+        // dump(town_plus);
+        // dump(town_minus);
+
+        for (var index_plus=0;index_plus<town_plus.length;index_plus++)
+        {
+            this.output('distributing from '+town_plus[index_plus]['name']+': '+town_plus[index_plus]['value']);
+            trade_available = town_plus[index_plus]['value'];
+            for (var index_minus=0;index_minus<town_minus.length;index_minus++)
+            {
+                this.output("\t "+town_minus[index_minus]['name']+' need '+town_minus[index_minus]['value']);
+                // skip if 0 if needed for trade
+                if ((town_plus[index_plus]['value'] == 0) || (town_minus[index_minus]['value'] == 0))
+                    continue;
+
+                // if plus city has enough trade stock to fill the diff
+                if (trade_available >= town_minus[index_minus]['value'])
+                {
+                    number = town_minus[index_minus]['value'];
+                    name = town_plus[index_plus]['name'];
+                    target = town_minus[index_minus]['name'];
+                    this.output('sending: '+number+' '+tradegood+' from:'+name+' to: '+target);
+                    town_plus[index_plus]['value'] -= number;
+                    town_minus[index_minus]['value'] = 0;
+                    trade_available = town_plus[index_plus]['value'];
+                    // this.add_transport(name, target, tradegood, number);
+                }
+                else
+                {   // plus city has not enough to fill this minus city
+                    // send what we have anyway and update
+                    number = trade_available;
+                    name = town_plus[index_plus]['name'];
+                    target = town_minus[index_minus]['name'];
+                    this.output('sending: '+number+' '+tradegood+' from:'+name+' to: '+target);
+                    town_plus[index_plus]['value'] = 0;
+                    town_minus[index_minus]['value'] -= number;
+                    trade_available = 0;
+                    // this.add_transport(name, target, tradegood, number);
+                }
+            }
+        }
+    }
+};
+
 casper.action_equalize = function(item, names, index, todo_json) {
 
     var tradeGoods  = [
