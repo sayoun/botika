@@ -50,6 +50,12 @@ var next;
 casper.then(function() {
     // this.capture('ikariam_login.png');
 
+    if (!this.getTitle())
+    {
+        this.output('Cannot log in');
+        this.exit(0);
+    }
+
     // AUTO ACCEPT DAILY BONUS
     if (this.exists('div[class="dailyActivityButton"] input[class~="okButton"]')) {
         this.thenClick('div[class="dailyActivityButton"] input[class~="okButton"]');
