@@ -53,7 +53,13 @@ casper.then(function() {
     if (!this.getTitle())
     {
         this.output('Cannot log in');
-        this.exit(0);
+        this.reload(function() {
+            this.output("Try loading again");
+        });
+        if (!this.getTitle())
+        {
+            this.exit(0);
+        }
     }
 
     // AUTO ACCEPT DAILY BONUS
