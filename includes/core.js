@@ -233,6 +233,10 @@ casper.action_decision = function action_decision(force_donation) {
                 {
                     assign_donation = true;
                 }
+                else
+                {
+                    assign_donation = false;
+                }
 
                 skip_worker_for_town = false;
 

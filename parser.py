@@ -232,6 +232,7 @@ class Parser():
         building_list['port'] = {}
         building_list['shipyard'] = {}
         building_list['barracks'] = {}
+        building_list['branchOffice'] = {}
 
         # boosters
         building_list['winegrower'] = {}
@@ -276,19 +277,20 @@ class Parser():
                                                 building_list['wall'].get(city, '-'))
             )
 
-        header = "%-10s \t%-10s \t%8s \t%10s \t%8s \t%10s \t%10s" % ('City', 'academy', 'dump', 'warehouse', 'port', 'shipyard', 'barracks')
-        dict_print('-' * 110)
+        header = "%-10s \t%-10s \t%8s \t%10s \t%8s \t%10s \t%10s \t%10s" % ('City', 'academy', 'dump', 'warehouse', 'port', 'shipyard', 'barracks', 'branchOffice')
+        dict_print('-' * 128)
         dict_print(header)
-        dict_print('-' * 110)
+        dict_print('-' * 128)
 
         for city in data:
-            dict_print("%-10s \t%10s \t%8s \t%10s \t%8s \t%10s \t%10s" % (city,
+            dict_print("%-10s \t%10s \t%8s \t%10s \t%8s \t%10s \t%10s \t%10s" % (city,
                                                 building_list['academy'].get(city, '-'),
                                                 building_list['dump'].get(city, '-'),
                                                 building_list['warehouse'].get(city, '-'),
                                                 building_list['port'].get(city, '-'),
                                                 building_list['shipyard'].get(city, '-'),
-                                                building_list['barracks'].get(city, '-'))
+                                                building_list['barracks'].get(city, '-'),
+                                                building_list['branchOffice'].get(city, '-'))
             )
 
         header = "%-10s \t%-10s \t%10s \t%10s \t%10s \t%10s" % ('City', 'forester', 'glassblowing', 'winegrower', 'alchemist', 'stonemason')
@@ -352,6 +354,7 @@ class Parser():
         return "\n".join(self.output)
 
     def get_to_mail(self):
+	return True
 
         return self.to_mail
 

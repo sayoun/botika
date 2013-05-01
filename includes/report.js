@@ -227,7 +227,6 @@ function getNames() {
     return names;
 }
 
-
 function getPortLoading() {
 
     // return [];
@@ -335,6 +334,7 @@ var processPage = function(name, wine) {
 
     // GET BATIMENT INFO
     var city_building = this.evaluate(parsePage);
+
     // GET RESOURCE INFO
     var city_data = this.evaluate(getResourceInfo);
 

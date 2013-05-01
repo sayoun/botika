@@ -511,7 +511,6 @@ casper.todo_tranport_split = function(item, names, index) {
     };
 };
 
-
 casper.todo_tranport_simple = function(item, names, index) {
 
     split_resource = item['cargo'][0].resource;
@@ -563,7 +562,6 @@ casper.todo_tranport_simple = function(item, names, index) {
         this.send_transport(item.source, item.destination, split_resource, cargo_number, index, item.bookmark);
     }
 };
-
 
 casper.todo_tranport = function(item, names, index) {
 
