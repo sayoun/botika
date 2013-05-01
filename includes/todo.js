@@ -511,6 +511,60 @@ casper.todo_tranport_split = function(item, names, index) {
     };
 };
 
+
+casper.todo_tranport_simple = function(item, names, index) {
+
+    split_resource = item['cargo'][0].resource;
+    cargo_number = item['cargo'][0].number;
+
+    var fake_cargos = [];
+    load_time = mega_data['data']['port'][item.source]['ship_loading'];
+    distance_factor = 10;
+    cargo_optimum_size = load_time * distance_factor;
+
+    this.output('cargo_optimum_size:'+cargo_optimum_size+' load_time:'+load_time+' from:'+item.source+' to:'+item.destination);
+
+    var cargo_max_capacity = mega_data['global']['ships_available'] * 500;
+
+    if (cargo_number > cargo_max_capacity)
+    {
+        // si on veut envoyer plus que le max de bateaux on prend juste le max bateaux
+        cargo_number = cargo_max_capacity;
+    };
+
+    if (cargo_number > cargo_optimum_size)
+    {
+        cargo_count = Math.ceil(cargo_number / cargo_optimum_size);
+        this.output('cargo_count: '+cargo_count);
+
+        processed = 0;
+        for(var i=0;i<cargo_count;i++)
+        {
+            var to_send = cargo_optimum_size;
+            // if what's left to send is too small to split
+            if ((cargo_number - processed) < cargo_optimum_size)
+            {
+                to_send = cargo_number - processed;
+            };
+
+            fake_cargos.push(to_send);
+            processed += to_send;
+        }
+
+        for(var i=0;i<fake_cargos.length;i++)
+        {
+            this.output('sending:'+fake_cargos[i]+' '+split_resource+' from:'+item.source+' to:'+item.destination);
+            this.send_transport(item.source, item.destination, split_resource, fake_cargos[i], index, item.bookmark);
+        }
+    }
+    else
+    {
+        this.output('sending:'+cargo_number+' '+split_resource+' from:'+item.source+' to:'+item.destination);
+        this.send_transport(item.source, item.destination, split_resource, cargo_number, index, item.bookmark);
+    }
+};
+
+
 casper.todo_tranport = function(item, names, index) {
 
     var timeur = Math.floor((Math.random()*3000)+1);
@@ -1045,21 +1099,48 @@ casper.action_equalize = function(item, names, index, todo_json) {
 
     var tradeGoods  = [
                     'wood',
+                    'glass',
                     ];
 
     for(var i=0;i<tradeGoods.length;i++)
     {
         tradegood = tradeGoods[i];
+
+        var tab_eligible_towns = [];
+        // FOR EACH CITY
+        this.each(names, function(casper, name, i) {
+            // we have workers for this tradegood
+            if (mega_data['data']['resources'][name]['worked'][tradegood] > 0)
+            {
+                if (item.exclude_sources)
+                {
+                    if (item.exclude_sources.indexOf(name) != -1)
+                    {
+                        this.output('TOWN '+name+' MUST BE EXCLUDED!');
+                    }
+                    else
+                    {
+                        this.output('TOWN '+name+' MUST BE USED!');
+                        tab_eligible_towns.push(name);
+                    }
+                }
+                else
+                {
+                    tab_eligible_towns.push(name);
+                }
+            }
+        });
+
         // only wood for now
-        total_tradegood = this.get_total_tradegood_stock(names, tradegood);
+        total_tradegood = this.get_total_tradegood_stock(tab_eligible_towns, tradegood);
         // average needed per town
-        average_tradegood = Math.round(total_tradegood / names.length);
+        average_tradegood = Math.round(total_tradegood / tab_eligible_towns.length);
         this.output('average tradegood per town:'+average_tradegood);
 
         town_plus = [];
         town_minus = [];
         // for each town, compute diff
-        this.each(names, function(casper, name, i) {
+        this.each(tab_eligible_towns, function(casper, name, i) {
             diff = average_tradegood - mega_data['data']['resources'][name][tradegood]['value'];
             if (diff > 0) {
                 extra_output = '+';
