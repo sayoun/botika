@@ -8,7 +8,7 @@
                 "island_id": "4866",
                 "town_id": "city_65058"
             },
-            "Shandalar": {
+            "Arthenas": {
                 "island_id": "4866",
                 "town_id": "city_15357"
             },
@@ -43,6 +43,10 @@
             "Enia": {
                 "island_id": "4865",
                 "town_id": "city_26649"
+            },
+            "Kennor": {
+                "island_id": "4867",
+                "town_id": "city_86308"
             }
         },
     "sayan": {
