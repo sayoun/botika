@@ -17,43 +17,13 @@ casper.action_report = function action_report() {
 
         // this.thenClick('#inboxCity div[class="next"] a:first-child');
         // this.then(function() {
-        //     // this.capture('news_location3.png');
-        //     var news3 = this.evaluate(getCitiesInfo);
-        //     // dump(news3);
-        //     mega_data.news = mega_data.news.concat(news3);
+        //     mega_data.news = mega_data.news.concat(this.evaluate(getCitiesInfo));
         // });
-
         // this.thenClick('#inboxCity div[class="next"] a:first-child');
         // this.then(function() {
-        //     // this.capture('news_location4.png');
-        //     var news4 = this.evaluate(getCitiesInfo);
-        //     // dump(news4);
-        //     mega_data.news = mega_data.news.concat(news4);
+        //     mega_data.news = mega_data.news.concat(this.evaluate(getCitiesInfo));
         // });
 
-        // this.thenClick('#inboxCity div[class="next"] a:first-child');
-        // this.then(function() {
-        //     // this.capture('news_location5.png');
-        //     var news5 = this.evaluate(getCitiesInfo);
-        //     // dump(news5);
-        //     mega_data.news = mega_data.news.concat(news5);
-        // });
-
-        // this.thenClick('#inboxCity div[class="next"] a:first-child');
-        // this.then(function() {
-        //     // this.capture('news_location6.png');
-        //     var news6 = this.evaluate(getCitiesInfo);
-        //     // dump(news6);
-        //     mega_data.news = mega_data.news.concat(news6);
-        // });
-
-        // this.thenClick('#inboxCity div[class="next"] a:first-child');
-        // this.then(function() {
-        //     // this.capture('news_location7.png');
-        //     var news7 = this.evaluate(getCitiesInfo);
-        //     // dump(news7);
-        //     mega_data.news = mega_data.news.concat(news7);
-        // });
     });
     // #advResearch
     this.thenClick('#advResearch a:first-child');
@@ -120,7 +90,7 @@ casper.action_todo = function action_todo() {
                         // dump(data);
                         mega_data['global'] = data;
 
-                        if (mega_data['global']['ships_available'] == 0)
+                        if (mega_data['global']['ships_available'] < 10)
                         {
                             // no ship at all
                             this.output('NOT ENOUGH SHIPS TO SEND, ABORT !');
@@ -129,10 +99,22 @@ casper.action_todo = function action_todo() {
                         {
                             if (item.split)
                             {
+                                if (!todo_json['transport'][i]['cargo'][0]['number_to_send'])
+                                {
+                                    todo_json['transport'][i]['cargo'][0]['number_to_send'] = todo_json['transport'][i]['cargo'][0]['number'];
+                                }
                                 this.todo_tranport_split(item, names, i);
                             }
                             else {
-                                this.todo_tranport(item, names, i);
+                                // if it's a single cargo we need to create multi splits
+                                if (item.cargo.length == 1)
+                                {
+                                    this.todo_tranport_simple(item, names, i);
+                                    // this.todo_tranport(item, names, i);
+                                }
+                                else {
+                                    this.todo_tranport(item, names, i);
+                                }
                             }
                         }
                     }
@@ -193,7 +175,8 @@ casper.get_data = function get_data(wine) {
             'resources': {},
             'buildings': {},
             'construction': {},
-            'wine': {}
+            'wine': {},
+            'port': {}
         };
 
         // FOR EACH CITY
@@ -238,6 +221,7 @@ casper.action_decision = function action_decision(force_donation) {
             this.then(function() {
                 this.output('analyzing resources for: '+ name);
                 local_data = mega_data['data']['resources'][name];
+                local_data_building = mega_data['data']['buildings'][name];
                 assign_donation = false;
 
                 if (local_data['wood']['full'] > 90)
@@ -249,6 +233,32 @@ casper.action_decision = function action_decision(force_donation) {
                 {
                     assign_donation = true;
                 }
+
+                skip_worker_for_town = false;
+
+                this.each(local_data_building, function(self, item, i) {
+                    this.then(function() {
+
+                        if (item['palaceColony'])
+                        {
+                            if (item['palaceColony'].indexOf('->') != -1)
+                            {
+                                // currently building
+                                palaceColony_level = item['palaceColony'].substr(-1);
+                            }
+                            else
+                            {
+                                palaceColony_level = item['palaceColony'];
+                            }
+
+                            if (palaceColony_level < 10)
+                            {
+                                this.output('Town '+name+' not big enough, do not assign workers for her !');
+                                skip_worker_for_town = true;
+                            }
+                        }
+                    });
+                });
 
                 if (assign_max_workers || assign_donation)
                 {
@@ -325,6 +335,10 @@ casper.action_decision = function action_decision(force_donation) {
                                                 });
                                                 return tab;
                                             });
+                                            if (skip_worker_for_town)
+                                            {
+                                                slider_config['maxvalue'] = 0;
+                                            }
                                             this.output('workers:'+slider_config['inivalue']+' max:'+slider_config['maxvalue']);
                                         });
 
@@ -377,6 +391,10 @@ casper.action_decision = function action_decision(force_donation) {
                                                 });
                                                 return tab;
                                             });
+                                            if (skip_worker_for_town)
+                                            {
+                                                slider_config['maxvalue'] = 0;
+                                            }
                                             this.output('workers:'+slider_config['inivalue']+' max:'+slider_config['maxvalue']);
                                         });
 

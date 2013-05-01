@@ -227,6 +227,18 @@ function getNames() {
     return names;
 }
 
+
+function getPortLoading() {
+
+    // return [];
+
+    var entry = {};
+
+    entry.ship_loading = parseInt($('table.leftmenuTable td.sum.right').text().replace(/[^\d]/g, ''));
+
+    return entry;
+}
+
 function getWineUsedInfo() {
 
     // return [];
@@ -254,7 +266,7 @@ function parsePage() {
     $('#mainview > #locations > li[id^=position]').each(function()
         {
             var type = $(this).attr('class');
-            if ( (type != 'buildingGround land') && (type != 'buildingGround shore') )
+            if ( (type != 'buildingGround land') && (type != 'buildingGround shore') && (type != 'buildingGround wall'))
             {
                 // type = type.toLowerCase();
 
@@ -306,7 +318,21 @@ var processPage = function(name, wine) {
                 this.thenClick('#changeCityForm li[class="viewCity"] > a');
             });
         }
-    }
+    };
+
+    // GET SHIP LOADING INFO
+    if (this.exists('#mainview > #locations > li[class="port"] > a'))
+    {
+        this.thenClick('#mainview > #locations > li[class="port"] > a');
+        this.then(function() {
+            var city_port_info = this.evaluate(getPortLoading);
+            mega_data['data']['port'][name] = city_port_info;
+
+            // on revient sur l'ecran de la ville
+            this.thenClick('#changeCityForm li[class="viewCity"] > a');
+        });
+    };
+
     // GET BATIMENT INFO
     var city_building = this.evaluate(parsePage);
     // GET RESOURCE INFO
